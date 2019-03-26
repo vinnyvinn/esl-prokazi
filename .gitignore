@@ -1,4 +1,6 @@
 application/config/database.php
+vuejsfiles/helpers
+application/config/config.php
 vuejsfiles/node_modules
 /.settings/
 /.idea/
