@@ -21,7 +21,7 @@
         </div>
         <br>
         <div class="form-group">
-         <label for="supplier_id"><b>Track By</b></label>
+         <label for="track_by"><b>Track By</b></label>
          <select class="form-control" name="track_by" id="partselected" required>
           <option value="">--Select type--</option>
           <option value="hours">Hours</option>
@@ -598,10 +598,12 @@
        if(unit=='miles'){
          $('.mile').show();
          $('.kms').hide();
+         $('.hour').hide();
       }
       if(unit=='kilometer'){
          $('.kms').show();
          $('.mile').hide();
+          $('.hour').hide();
       }
       if(unit=='hours'){
          $('.kms').hide();
