@@ -312,6 +312,10 @@
               <label for="next_time_miles"><b>Next Mileage Maintenance</b></label>
                <input type="number" name="next_time_miles" class="form-control">
             </div>
+         <div class="form-group hour" style="display: none;">
+             <label for="next_time_hours"><b>Next Hours Maintenance</b></label>
+             <input type="number" name="next_time_hours" class="form-control">
+         </div>
             <div class="form-group kms" style="display: none;">
               <label for="next_time_km"><b>Next KM Maintenance</b></label>
               <input type="number" name="next_time_km" class="form-control">
@@ -603,23 +607,26 @@
 
 <script type="text/javascript">
   $(function() {
-    $('#partselected').change(function(){
-      var unit=$(this).val();
-       if(unit=='miles'){
-         $('.mile').show();
-         $('.kms').hide();
-      }
-      if(unit=='kilometer'){
-         $('.kms').show();
-         $('.mile').hide();
-      }
-      if(unit=='hours'){
-         $('.kms').hide();
-         $('.mile').hide();
-      }
-      $('.services').hide();
-      $('#' + $(this).val()).show();
-    });
+      $('#partselected').change(function(){
+          var unit=$(this).val();
+          if(unit=='miles'){
+              $('.mile').show();
+              $('.kms').hide();
+              $('.hour').hide();
+          }
+          if(unit=='kilometer'){
+              $('.kms').show();
+              $('.mile').hide();
+              $('.hour').hide();
+          }
+          if(unit=='hours'){
+              $('.kms').hide();
+              $('.mile').hide();
+              $('.hour').show();
+          }
+          $('.services').hide();
+          $('#' + $(this).val()).show();
+      });
   });
 </script>
 <script type="text/javascript">
