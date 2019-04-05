@@ -2,7 +2,8 @@
     <div class="panel panel-default">
         <div class="page-title clearfix">
             <h1>Third Level Support Reports</h1>
-            <a href="<?php echo base_url('ict_reports/print_ticket');?>" class="href btn btn-info btn-sm pull-right"><i class="fa fa-print"></i> Download Report</a>
+            <a href="<?php echo base_url('ict_reports/print_ticket');?>" class="href btn btn-info btn-sm pull-right"><i class="fa fa-file-pdf-o"></i> Export Pdf</a>
+            <a href="<?php echo base_url('ict_reports/extract_ticket');?>" class="href btn btn-info btn-sm pull-right"><i class="fa fa-file-excel-o"></i> Export Excel</a>
         </div>
         <div class="table-responsive">
             <table id="ict_reports_third_party-table" class="display" cellspacing="0" width="100%">            

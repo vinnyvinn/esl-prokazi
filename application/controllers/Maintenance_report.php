@@ -195,6 +195,43 @@ class Maintenance_report extends Pre_loader
 
     }
 
+    public function extract_m($start_date,$end_date)
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Code", "Description", "Track By", "Status","Date");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT * FROM jobs
+        WHERE reactive =0 AND (created_at BETWEEN '{$start_date}' AND '{$end_date}')")->result();
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->card_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->description);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->track_by);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->status);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, date('d-m-Y',strtotime($row->created_at)));
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Preventive Maintenance Data.xls"');
+        $object_writer->save('php://output');
+}
     public function jobcard_range_r()
     {
         $this->template->rander('maintenance/preventive/jobcard_range_form_r');
@@ -210,6 +247,42 @@ class Maintenance_report extends Pre_loader
         $this->template->rander('maintenance/reactive/reactive_index', $view_data);
     }
 
+    public function extract_report_r($from,$to)
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Code", "Description", "Track By", "Status","Date");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data = $this->db->query("SELECT * FROM jobs
+        WHERE reactive =1 AND (created_at BETWEEN '{$from}' AND '{$to}')")->result();
+
+        $excel_row = 2;
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->card_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->description);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->track_by);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->status);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, date('d-m-Y',strtotime($row->created_at)));
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Reactive Maintenance Data.xls"');
+        $object_writer->save('php://output');
+}
     public function print_report_r($start_date, $end_date)
     {
 

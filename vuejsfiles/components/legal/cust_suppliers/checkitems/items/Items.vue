@@ -58,7 +58,7 @@
         data: () => ({
             data: 0,
             columns: columns,
-            url: appdetails.approoturl + '/Checkitems/index',
+            url: appdetails.approoturl + '/checkitems/index',
             sortOrder: [{
                 field: 'name',
                 direction: 'asc'
@@ -77,6 +77,7 @@
         },
         methods: {
             additems() {
+                console.log('wlalalal')
                 this.$modal.show('check-items');
             },
             editRow(data){

@@ -11,7 +11,8 @@
         <div class="panel panel-default">
             <div class="page-title clearfix">
                 <h1>Disposal list</h1>
-                <a href="<?php echo base_url('inventory_assets/print_disposal_list');?>" class="btn btn-info btn-sm pull-right"><i class="fa fa-print"> Download Report</i></a>
+                <a href="<?php echo base_url('inventory_assets/print_disposal_list');?>" class="btn btn-info btn-sm pull-right"><i class="fa fa-file-pdf-o"> Export Pdf</i></a>
+                <a href="<?php echo base_url('inventory_assets/extract_disposal_list');?>" class="btn btn-info btn-sm pull-right walla"><i class="fa fa-file-excel-o"> Export Excel</i></a>
 
             </div>
             <div class="table-responsive">

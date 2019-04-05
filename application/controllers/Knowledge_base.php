@@ -238,4 +238,42 @@ public function validate_file ()
         $this->pdf2->stream('knowledgebase.pdf');
     }
 
+    public function extract_k($from,$to)
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Title", "Type", "solution", "Hits","Date");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT tbl_knowledge_base.*,tbl_knowledge_base_types.name FROM tbl_knowledge_base
+  LEFT JOIN tbl_knowledge_base_types ON tbl_knowledge_base_types.id=tbl_knowledge_base.type_id WHERE 
+  (tbl_knowledge_base.created_at BETWEEN '{$from}' AND '{$to}')")->result();
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->title);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->name);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->solution);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->hits);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, date('d-m-Y',strtotime($row->created_at)));
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Knowledgebase Data.xls"');
+        $object_writer->save('php://output');
+    }
+
 }

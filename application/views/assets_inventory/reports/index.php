@@ -5,7 +5,9 @@
 
             <?php
             if($assets) {
-                echo anchor(get_uri("inventory_assets/print_report/".$dates['from'].'/'.$dates['to']), "<i class='fa fa-print'></i> " . lang('print_report'), array("class" => "btn btn-success pull-right rq", "title" => lang('print_report'))); }?>
+                echo anchor(get_uri("inventory_assets/print_report/".$dates['from'].'/'.$dates['to']), "<i class='fa fa-file-pdf-o'></i> " . 'Export Pdf', array("class" => "btn btn-success pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("inventory_assets/excel_report/".$dates['from'].'/'.$dates['to']), "<i class='fa fa-file-excel-o'></i> " . 'Export Excel', array("class" => "btn btn-success pull-right rq walla", "title" => lang('print_report')));
+            }?>
         </div>
     </div>
     <div class="panel-body">
@@ -34,7 +36,7 @@
                             <td><?php echo $asset->model_no?></td>
                             <td><?php echo $asset->serial_no?></td>
                             <td><?php echo $asset->username?></td>
-                            <td><?php echo $asset->updated_at?></td>
+                            <td><?php echo date('d-m-Y',strtotime($asset->updated_at))?></td>
 
 
                         </tr>

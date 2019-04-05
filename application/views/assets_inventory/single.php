@@ -16,7 +16,11 @@
             </div>
             <div class="form-group">
               <label for="Department">Department</label>
-              <input type="text" name="department" class="form-control" value="<?php echo $assets->department?>" disabled>
+                <?php
+                $department = $this->db->query("SELECT name FROM departments where id={$assets->department}")->row();
+
+                ?>
+              <input type="text" name="department" class="form-control" value="<?php echo $department ? $department->name : ''?>" disabled>
             </div>
 
             <div class="form-group">
@@ -29,7 +33,7 @@
           <div class="col-sm-4">
           	 <div class="form-group">
               <label for="Supplier">Supplier</label>
-              <input class="form-control" name="supplier" id="supplier" value="<?php echo $supplier?>" disabled>
+              <input class="form-control" name="supplier" id="supplier" value="<?php echo $assets->supplier?>" disabled>
 
               </div>
               <div class="form-group">
@@ -68,8 +72,8 @@
                    <?php if(!$assets->status ==1 || !$assets->status ==2) {?>
                  <div class="text-center">
                     <div class="form-group">
-                        <a href="<?php echo base_url('inventory_assets/accept_asset/'.$assets->id);?>" class="btn btn-success btn-sm"><i data-toggle="tooltip" title="accept" class="fa fa-check"></i></a>
-                        <a href="<?php echo base_url('inventory_assets/reject_asset/'.$assets->id);?>" class="btn btn-danger btn-sm"><i data-toggle="tooltip" title="reject" class="fa fa-times"></i></a>
+                        <a href="<?php echo base_url('inventory_assets/accept_asset/'.$assets->id);?>" class="btn btn-success btn-sm"><i  title="accept" class="fa fa-check"></i></a>
+                        <a href="<?php echo base_url('inventory_assets/reject_asset/'.$assets->id);?>" class="btn btn-danger btn-sm"><i  title="reject" class="fa fa-times"></i></a>
                     </div>
                  </div>
                 <?php }?>

@@ -7,6 +7,9 @@ html, body {
     height:100%;
     overflow: hidden;
 }
+.walla{
+    margin-right: 10px !important;
+}
 h1, h2, h3, h4{
     font-weight: normal;   
 }

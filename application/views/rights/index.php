@@ -4,7 +4,8 @@
     <div class="panel panel-default">
         <div class="panel-heading" style="margin-top: -8px">User Roles Report
             <a href="<?php echo base_url('user_rights/print_form/' . $role_type); ?>"
-               class="btn btn-info btn-sm pull-right"><i class="fa fa-print"> Download Report</i></a>
+               class="btn btn-info btn-sm pull-right"><i class="fa fa-file-pdf-o"> Export Pdf</i></a>
+            <a href="<?php echo base_url('user_rights/print_u/' . $role_type); ?>" class="btn btn-info btn-sm pull-right walla"><i class="fa fa-file-excel-o"> Export Excel</i></a>
         </div>
 
         <div class="panel-body">

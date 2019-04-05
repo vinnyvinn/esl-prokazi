@@ -1,7 +1,8 @@
 <div class="modal-body clearfix">
    <div class="panel panel-default">
     <div class="panel-heading" style="margin-top: -8px">Fuel Reports
-        <?php echo anchor(get_uri("fuel_reports/print_report"), "<i class='fa fa-file-pdf-o pdfcolor'></i> " .'Print Report', array("class" => "btn btn-info pull-right rq")); ?>
+        <?php echo anchor(get_uri("fuel_reports/print_report"), "<i class='fa fa-file-pdf-o pdfcolor'></i> " .'Export Pdf', array("class" => "btn btn-info pull-right rq")); ?>
+        <?php echo anchor(get_uri("fuel_reports/extract_fuel"), "<i class='fa fa-file-excel-o pdfcolor'></i> " .'Export Excel', array("class" => "btn btn-info pull-right rq walla")); ?>
   </div>
 <img src="<?php echo base_url('/assets/images/esl.png');?>"  alt="esl logo" class="pull-right">
 <div class="panel-body">
@@ -15,7 +16,7 @@
             <br>
             
         </div>
-        <table class="table table-striped table-bordered"  style="width: 100%">
+        <table class="table table-striped table-bordered dataTable"  style="width: 100%">
            <thead>
              <tr>
                <th>Vehicle</th>
@@ -77,3 +78,8 @@
     color: red;
 }
 </style>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.dataTable').DataTable();
+    } );
+</script>

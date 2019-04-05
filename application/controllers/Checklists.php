@@ -124,6 +124,47 @@ $this->template->rander('checklists/reports/checklists/checklist_form');
         $this->pdf2->render();
         $this->pdf2->stream('checklist.pdf');
     }
+    // create xlsx
+    public function create_checklist($from,$to) {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Ref NO", "Performed By", "Date", "Status");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT tbl_checklist_tasks.*,CONCAT(users.first_name,' ',users.last_name) as username,
+       tbl_checklist_status.name as state  FROM tbl_checklist_tasks
+       LEFT JOIN users ON users.id=tbl_checklist_tasks.performed_by 
+       LEFT JOIN tbl_checklist_status ON tbl_checklist_status.id=tbl_checklist_tasks.status
+       WHERE (tbl_checklist_tasks.performed_on BETWEEN '$from' AND '$to')")->result();
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->ref_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->username);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->performed_on);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->state);
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Checklists Data.xls"');
+        $object_writer->save('php://output');
+
+
+}
     public function view_checklist($id){
        $view_data['checklist'] = $this->db->query("SELECT tbl_checklist_tasks.*,CONCAT(users.first_name,' ',users.last_name) as username,
        tbl_checklist_status.name as state  FROM tbl_checklist_tasks
