@@ -5,7 +5,9 @@
 
             <?php
             if($job_cards) {
-                echo anchor(get_uri("maintenance_report/print_report_p/".$dates['from'].'/'.$dates['to']), "<i class='fa fa-print'></i> " . lang('print_report'), array("class" => "btn btn-success pull-right rq", "title" => lang('print_report'))); }?>
+                echo anchor(get_uri("maintenance_report/print_report_p/".$dates['from'].'/'.$dates['to']), "<i class='fa fa-file-pdf-o'></i> " . 'Export Pdf', array("class" => "btn btn-success pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("maintenance_report/extract_m/".$dates['from'].'/'.$dates['to']), "<i class='fa fa-file-excel-o'></i> " .'Export Excel', array("class" => "btn btn-success pull-right rq walla", "title" => lang('print_report')));
+            }?>
         </div>
     </div>
     <div class="panel-body">
@@ -32,7 +34,7 @@
                             <td><?php echo $prev->description?></td>
                             <td><?php echo $prev->track_by?></td>
                             <td><?php echo $prev->status?></td>
-                            <td><?php echo $prev->created_at?></td>
+                            <td><?php echo date('d-m-Y',strtotime($prev->created_at))?></td>
 
 
                         </tr>

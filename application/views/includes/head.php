@@ -21,7 +21,8 @@
         "assets/js/summernote/summernote.css",
         "assets/css/style-0000001.css",
         "assets/css/custom-style.css",
-        "assets/css/sweetalert2.min.css"
+        "assets/css/sweetalert2.min.css",
+        "assets/css/jquery.printarea.css"
 
 
     ));
@@ -45,7 +46,9 @@
         "assets/js/summernote/summernote.min.js",
         "assets/js/app-0000006.js",
         "assets/js/sweetalert2.min.js",
-        "assets/js/es6-promise.auto.min.js"
+        "assets/js/es6-promise.auto.min.js",
+        "assets/js/jquery.printarea.js"
+
     ));
     ?>
 </head>

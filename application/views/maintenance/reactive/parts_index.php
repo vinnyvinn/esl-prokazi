@@ -5,7 +5,8 @@
 
             <?php
             if($parts) {
-                echo anchor(get_uri("parts_requisition/print_items"), "<i class='fa fa-print'></i> " . lang('print_report'), array("class" => "btn btn-info btn-sm pull-right rq", "title" => lang('print_report'))); }?>
+                echo anchor(get_uri("parts_requisition/print_items"), "<i class='fa fa-file-pdf-o'></i> " . 'Export Pdf', array("class" => "btn btn-info btn-sm pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("parts_requisition/extract_items"), "<i class='fa fa-file-excel-o'></i> " . 'Export Excel', array("class" => "btn btn-info btn-sm pull-right rq walla", "title" => lang('print_report'))); }?>
         </div>
     </div>
     <div class="panel-body">

@@ -22,7 +22,10 @@
                 ?>
               </select>
             </div>
-           
+           <?php
+           echo "<pre>";
+
+           ?>
             <div class="form-group">
               <label for="custodian">Custodian</label>
                   <select class="form-control" name="custodian" id="custodian">
@@ -43,7 +46,7 @@
           <div class="col-sm-4">
           	 <div class="form-group">
               <label for="Supplier">Supplier</label>
-              
+              <?php echo  $assets->supplier;?>
               <select class="form-control" name="supplier" id="supplier">
                   <option value="<?php echo $assets->supplier?>"><?php echo $assets->supplier?></option>
                 <?php

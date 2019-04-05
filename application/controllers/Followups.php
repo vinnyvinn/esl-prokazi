@@ -89,4 +89,42 @@ class Followups extends Pre_loader
         $this->pdf2->stream('checklists.pdf');
 
     }
+
+    public function extract_checklist($start_date,$end_date)
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Vehicle", "Mileage", "Date");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT followups.*,assets.code FROM followups LEFT JOIN assets ON assets.id=followups.vehicle_id
+        WHERE (followups.created BETWEEN '{$start_date}' AND '{$end_date}')")->result();
+
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->code);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->mileage .' '. $row->measurement);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->date);
+
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Checklists Data.xls"');
+        $object_writer->save('php://output');
+    }
 }

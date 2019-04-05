@@ -9,11 +9,13 @@
 <table class="table table-striped table-bordered"  style="width: 100%">
     <thead>
     <tr>
-        <th>No.</th>
-        <th>Code</th>
-        <th>Description</th>
-        <th>Selling Date</th>
-        <th>Selling Price</th>
+    <th>#</th>
+    <th>Code</th>
+    <th>Description</th>
+    <th>Purchase Date</th>
+    <th>Purchase Price</th>
+
+
 
     </tr>
     </thead>
@@ -24,8 +26,8 @@
             <td><?php echo $disposal->idAssetNo;?></td>
             <td><?php echo $disposal->cAssetCode;?></td>
             <td><?php echo $disposal->cAssetDesc;?></td>
-            <td><?php echo $disposal->dSellingDate;?></td>
-            <td><?php echo $disposal->fSellingPrice;?></td>
+            <td><?php echo date('d-m-Y',strtotime($disposal->dPurchaseDate));?></td>
+            <td><?php echo $disposal->fPurchaseValue;?></td>
         </tr>
     <?php }?>
 

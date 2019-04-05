@@ -62,6 +62,61 @@ public function  entries_details(){
         $this->pdf2->render();
         $this->pdf2->stream('tickets.pdf');
     }
+    // create xlsx
+    public function createXLS($from,$to) {
+        // create file name
+        $fileName = 'tickets-'.time().'.xlsx';
+        // load excel library
+        $this->load->library('excel');
+        $empInfo =  $this->db->query("SELECT support_entries.*,CONCAT(users.first_name,' ',users.last_name) as username,ticket_types.title as ticket_type FROM support_entries
+       LEFT JOIN  users ON users.id=support_entries.created_by 
+       LEFT JOIN ticket_types ON ticket_types.id=support_entries.ticket_type_id WHERE (support_entries.created_at BETWEEN '$from' AND '$to')")->result();
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+        // set Header
+        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Title');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B1', 'Ticket type');
+        $objPHPExcel->getActiveSheet()->SetCellValue('C1', 'Created By');
+        $objPHPExcel->getActiveSheet()->SetCellValue('D1', 'Assigned To');
+        $objPHPExcel->getActiveSheet()->SetCellValue('E1', 'Opened Date');
+        $objPHPExcel->getActiveSheet()->SetCellValue('F1', 'Closed Date');
+        $objPHPExcel->getActiveSheet()->SetCellValue('G1', 'Duration');
+        // set Row
+        $rowCount = 2;
+        foreach ($empInfo as $element) {
+            $created = new DateTime($element->created_at);
+            $created_t=$created->format('d/m/y');
+             $closed_date = new DateTime($element->created_at);
+            $closed_date_t=$closed_date->format('d/m/y');
+           $duration = '';
+            $start_date=strtotime($element->created_at);
+            $end_date=strtotime($element->closed_date);
+            if($end_date) {
+                $d_t =(($end_date/(60*60)) - ($start_date/(60*60)));
+                $duration= ceil($d_t) .'hrs';
+            }
+            $objPHPExcel->getActiveSheet()->SetCellValue('A' . $rowCount, $element->title);
+            $objPHPExcel->getActiveSheet()->SetCellValue('B' . $rowCount, $element->ticket_type);
+            $objPHPExcel->getActiveSheet()->SetCellValue('C' . $rowCount, $element->username);
+            $objPHPExcel->getActiveSheet()->SetCellValue('D' . $rowCount, $element->assign_to ? $this->db->query("select * from users where id={$element->assign_to}")->row()->first_name.' '.$this->db->query("select * from users where id={$element->assign_to}")->row()->last_name : '');
+            $objPHPExcel->getActiveSheet()->SetCellValue('E' . $rowCount, $created_t);
+            $objPHPExcel->getActiveSheet()->SetCellValue('F' . $rowCount, $closed_date_t);
+            $objPHPExcel->getActiveSheet()->SetCellValue('G' . $rowCount, $duration);
+            $rowCount++;
+        }
+//        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+//        $objWriter->save(ROOT_UPLOAD_IMPORT_PATH.$fileName);
+//        // download file
+//        header("Content-Type: application/vnd.ms-excel");
+//        redirect(HTTP_UPLOAD_IMPORT_PATH.$fileName);
+
+        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+        $objWriter->save($fileName);
+        // download file
+        header("Content-Type: application/vnd.ms-excel");
+        redirect(site_url().$fileName);
+    }
+
   public function support_tickets() {
     $this->template->rander("checklists/reports/support_tickets/index");
   }
@@ -117,6 +172,50 @@ public function  entries_details(){
       $this->pdf2->load_view('checklists/reports/support_entries/print_third_level', $view_data);
       $this->pdf2->render();
       $this->pdf2->stream('thirdlevelsupport.pdf');
+  }
+
+    public function extract_ticket()
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Subject", "Message", "Ticket Type", "Assigned To","Email","Phone","Date","Status");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data = $list_data = $this->db->query("SELECT third_party_messages.*,tbl_third_party.username,tbl_third_party.email,
+        tbl_third_party.phone ,support_entries.title as subject,ticket_types.title as ticket,support_entries.status FROM third_party_messages
+        LEFT JOIN support_entries ON support_entries.id = third_party_messages.ticket_id
+        LEFT JOIN ticket_types ON ticket_types.id = support_entries.ticket_type_id
+        LEFT JOIN tbl_third_party ON tbl_third_party.id=third_party_messages.third_p_id")->result();
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->subject);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->message);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->ticket);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->username);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, $row->email);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(5, $excel_row, $row->phone);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(6, $excel_row, $row->created_at);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(7, $excel_row, $row->status);
+            $excel_row++;
+        }
+// return array($data->id, $subject, $data->message,$data->ticket, $data->username,$data->email,$data->phone, $data->created_at,$ticket_status);
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Supports Data.xls"');
+        $object_writer->save('php://output');
   }
 
   private function third_parties_make_row($data) {
@@ -867,6 +966,42 @@ public function  entries_details(){
        $this->pdf2->stream('assetsmaintenance.pdf');
    }
 
+    public function extract_asset()
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Asset", "Assigned To", "Status", "Date");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT preventive_maintainance.*,CONCAT(users.first_name,' ',users.last_name) as username FROM preventive_maintainance
+       LEFT JOIN users ON users.id=preventive_maintainance.assigned_id")->result();
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->sage_item_id);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->username);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->status == 0 ? 'Not Performed' :'Performed');
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, date('d-m-Y',strtotime($row->created_at)));
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Assets Maintenance Data.xls"');
+        $object_writer->save('php://output');
+}
  public function perform_maintenance() {
 
     $id = $this->input->post('id');

@@ -181,4 +181,43 @@ WHERE ( StkItem . ItemActive = 1 ) AND ( StkItem . ServiceItem = 0 ) AND ( StkIt
         $this->pdf2->stream('spareparts.pdf');
     }
 
+    public function extract_items()
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Requisition NO", "Code", "Item Name", "Quantity",'Description','Total Amount','Date');
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT spares.*,jobs.card_no FROM spares
+   LEFT JOIN jobs  ON jobs.id = spares.job_card_id")->result();
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->requisition_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->card_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->stock_name);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->qnty_out);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(5, $excel_row, $row->description);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(6, $excel_row, number_format($row->total,2));
+            $object->getActiveSheet()->setCellValueByColumnAndRow(7, $excel_row, date('d-m-Y',strtotime($row->created)));
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Parts Requisitions Data.xls"');
+        $object_writer->save('php://output');
+    }
+
 }

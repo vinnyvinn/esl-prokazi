@@ -75,6 +75,7 @@ class Inventory_assets extends Pre_loader {
 public function view_form($id){
 
 $user = $this->db->query("SELECT * FROM inventory_assets WHERE id=$id")->row_array();
+
 $custodian = $user['custodian'];
 $from = $user['assign_by'];
 $view_data['id'] = $id;
@@ -82,6 +83,7 @@ $view_data['asset'] = $this->db->query("SELECT * FROM inventory_assets WHERE id=
 $view_data['custodian'] = $this->db->query("SELECT * FROM users WHERE id=$custodian")->row_array();
 $view_data['from'] = $this->db->query("SELECT * FROM users WHERE id=$from")->row_array();
 $view_data['hr'] = $this->db->query("SELECT * FROM users WHERE job_title like '%Corporate Support : HR & Admin Manager%'")->row_array();
+$view_data['assets'] = $this->db->query("SELECT * FROM inventory_assets where custodian={$user['custodian']}")->result();
 $this->template->rander('assets_inventory/add_asset',$view_data);
 }
 
@@ -327,13 +329,85 @@ public function asset_disposal_list() {
         $this->pdf2->stream('disposallist.pdf');
     }
 
+    public function extract_disposal_list()
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Code", "Description", "Selling Date", "Selling Price");
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data = $this->SAGE_DB()->query("SELECT idAssetNo,cAssetCode,cAssetDesc,dSellingDate,fSellingPrice FROM _btblFAAsset WHERE cAssetCode in('126','287')")->result();
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->cAssetCode);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->cAssetDesc);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->dSellingDate);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->fSellingPrice);
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Asset Disposal List Data.xls"');
+        $object_writer->save('php://output');
+
+    }
+
     public function print_due_disposal(){
-        $view_data['disposals'] =  $this->SAGE_DB()->query("SELECT  idAssetNo,cAssetCode,cAssetDesc,dSellingDate,fSellingPrice FROM _btblFAAsset WHERE iAssetTypeNo=3 AND 1435 <= DATEDIFF(day,dPurchaseDate, CURRENT_TIMESTAMP)")->result();
+        $view_data['disposals'] = $this->SAGE_DB()->query("SELECT  *  FROM _btblFAAsset WHERE iAssetTypeNo=3 AND 1435 <= DATEDIFF(day,dPurchaseDate, CURRENT_TIMESTAMP)")->result();
 
         $this->load->library('pdf2');
         $this->pdf2->load_view('assets_inventory/reports/print_due_disposal_list', $view_data);
         $this->pdf2->render();
         $this->pdf2->stream('duedisposal.pdf');
+    }
+
+    public function extract_due_disposal()
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Code", "Description", "Purchase Date", "Purchase Price");
+
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->SAGE_DB()->query("SELECT  *  FROM _btblFAAsset WHERE iAssetTypeNo=3 AND 1435 <= DATEDIFF(day,dPurchaseDate, CURRENT_TIMESTAMP)")->result();
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->cAssetCode);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->cAssetDesc);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, date('d-m-Y',strtotime($row->dPurchaseDate)));
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->fPurchaseValue);
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Assets Due Disposal Data.xls"');
+        $object_writer->save('php://output');
+
     }
 
 public function asset_delete($id)
@@ -388,6 +462,46 @@ public function print_report($from,$to){
     $this->pdf2->load_view('assets_inventory/reports/print_form', $view_data);
     $this->pdf2->render();
     $this->pdf2->stream('assets.pdf');
+}
+
+    public function excel_report($from,$to)
+    {
+        $this->load->library("excel");
+        $object = new PHPExcel();
+
+        $object->setActiveSheetIndex(0);
+
+        $table_columns = array("Code", "Title", "Model No", "Serial No","Custodian","Date");
+        $column = 0;
+
+        foreach($table_columns as $field)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow($column, 1, $field);
+            $column++;
+        }
+
+        $employee_data =$this->db->query("SELECT inventory_assets.*,CONCAT(users.first_name,' ',users.last_name) as username,departments.name as designation,departments.id as dept_id FROM inventory_assets
+       LEFT JOIN  users ON users.id=inventory_assets.custodian 
+       LEFT JOIN departments ON departments.id=inventory_assets.department
+        WHERE (inventory_assets.updated_at BETWEEN '$from' AND '$to')")->result();
+
+        $excel_row = 2;
+
+        foreach($employee_data as $row)
+        {
+            $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->card_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->title);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->model_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->serial_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, $row->username);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(5, $excel_row, date('d-m-Y',strtotime($row->updated_at)));
+            $excel_row++;
+        }
+
+        $object_writer = PHPExcel_IOFactory::createWriter($object, 'Excel5');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment;filename="Inventory Assets Data.xls"');
+        $object_writer->save('php://output');
 }
 
 public function view_asset($id){

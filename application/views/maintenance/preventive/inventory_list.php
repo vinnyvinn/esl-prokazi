@@ -3,7 +3,8 @@
 <div class="modal-body clearfix">
     <div class="panel panel-default">
         <div class="panel-heading" style="margin-top: -8px">Inventory List
-            <a href="<?php echo base_url('preventive/print_inventory');?>" class="btn btn-info btn-sm pull-right"><i class="fa fa-print"> Download Report</i></a>
+            <a href="<?php echo base_url('preventive/print_inventory');?>" class="btn btn-info btn-sm pull-right"><i class="fa fa-file-pdf-o"> Export Pdf</i></a>
+            <a href="<?php echo base_url('preventive/extract_inventory');?>" class="btn btn-info btn-sm pull-right walla"><i class="fa fa-file-excel-o"> Export Excel</i></a>
         </div>
     </div>
     <div class="panel-body">

@@ -3,8 +3,8 @@
 <div class="modal-body clearfix">
     <div class="panel panel-default">
         <div class="panel-heading">ICT Assets Maintainance Reports
-
-            <a href="<?php echo base_url('ict_reports/print_asset_form');?>" class="btn btn-info btn-sm pull-right"  style="margin-top: -4px"><i class="fa fa-print"> Download Report</i></a>
+            <a href="<?php echo base_url('ict_reports/print_asset_form');?>" class="btn btn-info btn-sm pull-right"  style="margin-top: -4px"><i class="fa fa-file-pdf-o"> Export Pdf</i></a>
+            <a href="<?php echo base_url('ict_reports/extract_asset');?>" class="btn btn-info btn-sm pull-right walla"  style="margin-top: -4px"><i class="fa fa-file-excel-o"> Export Excel</i></a>
         </div>
     </div>
     <div class="panel-body">

@@ -1,11 +1,12 @@
 <?php echo form_open('"id" = "create-parts-form", "class" = "general-form", "role" = "form"'); ?>
 <div class="modal-body clearfix">
     <div class="panel panel-default">
-        <div class="panel-heading" style="margin-top: -8px">Support Entries Report
+        <div class="panel-heading" style="margin-top: -8px">Knowledgebase Report
 
             <?php
             if ($reports) {
-                echo anchor(get_uri("knowledge_base/print_form/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-print'></i> " . lang('print_report'), array("class" => "btn btn-info btn-sm pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("knowledge_base/print_form/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-pdf-o'></i> " . 'Export Pdf', array("class" => "btn btn-info btn-sm pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("knowledge_base/extract_k/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-excel-o'></i> " . 'Export Excel', array("class" => "btn btn-info btn-sm pull-right rq walla", "title" => lang('print_report')));
             } ?>
         </div>
     </div>
@@ -34,7 +35,7 @@
                             <td><?php echo $r->name ?></td>
                             <td><?php echo $r->solution ?></td>
                             <td><?php echo $r->hits ?></td>
-                            <td><?php echo $r->created_at ?></td>
+                            <td><?php echo date('d-m-Y',strtotime($r->created_at)) ?></td>
                             </tr>
                     <?php } ?>
                     </tbody>

@@ -14,8 +14,10 @@
         <div class="panel-heading" style="margin-top: -8px">Support Entries Report
 
             <?php
+
             if ($entries) {
-                echo anchor(get_uri("ict_reports/print_entries/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-print'></i> " . lang('print_report'), array("class" => "btn btn-success pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("ict_reports/print_entries/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-pdf-o'></i> " . 'Export pdf', array("class" => "btn btn-success pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("ict_reports/createXLS/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-excel-o'></i> " . 'Export Excel', array("class" => "btn btn-success pull-right rq walla", "title" => lang('print_report')));
             } ?>
         </div>
     </div>
@@ -39,7 +41,6 @@
                     <tbody>
                     <?php foreach ($entries as $entry) { ?>
                         <tr>
-
                             <td><?php echo $entry->id ?></td>
                             <td><?php echo $entry->title ?></td>
                             <td><?php echo $entry->ticket_type ?></td>
@@ -54,7 +55,6 @@
                                 $end_date=strtotime($entry->closed_date);
                                 if($end_date) {
                                     $d_t =(($end_date/(60*60)) - ($start_date/(60*60)));
-
                                     echo ceil($d_t) .'hrs';
                                 }
                                 ?>
