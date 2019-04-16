@@ -638,6 +638,7 @@ private function _make_row($data) {
         public function view_support($ticket_id = 0)
         {
 
+
           if (! $ticket_id) {
             return;
           }
@@ -650,6 +651,13 @@ private function _make_row($data) {
             if ($ticket_info) {
                 $view_data['ticket_info'] = $ticket_info;
                 $view_data['ticket_type'] = $this->Ticket_types_model->get_one($ticket_info->ticket_type_id);
+               $check_ticket = $this->db->query("SELECT * FROM support_entries where id={$ticket_id}")->row();
+
+               if($check_ticket->ticket_id =='system'){
+                   $view_data['status'] ='yes';
+
+               }
+                $view_data['status'] ='no';
 
             $view_data['comments'] = $this->Support_comments_model->getComments($ticket_id);
             $this->template->rander("tickets/support_view", $view_data);

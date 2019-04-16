@@ -386,7 +386,7 @@ public function  entries_details()
             $subject.="<span class='pull-right'>" . $ticket_labels . "</span>";
           }
 
-          $ticket_type = $this->Ticket_types_model->get_one($data->ticket_type_id)->title;
+          $ticket_type = $data->ticket_type_id ? $this->Ticket_types_model->get_one($data->ticket_type_id)->title : $data->ticket_id;
 
         // $assigned_to = anchor(get_uri("team_members/view/" . $data->id), $this->Users_model->get_one($data->assigned_to)->first_name . " " . $this->Users_model->get_one($data->assigned_to)->last_name);
 
