@@ -363,6 +363,7 @@ public function  entries_details()
 
           $result = array();
           foreach ($list_data as $data) {
+
             $result[] = $this->support_tickets_make_row($data);
           }
           echo json_encode(array("data" => $result));
@@ -391,7 +392,7 @@ public function  entries_details()
 
         // $escalation_matrix = $data->escalation_matrix != 0 ? modal_anchor(get_uri("ict_reports/excalation_matrix_view"), $data->escalation_matrix, array("class" => "edit", "title" => "Escalation Matrix", "data-post-view" => "details", "data-post-id" => $data->escalation_matrix)) : "None";
 
-          $created_by =  $this->Users_model->get_one($data->created_by)->first_name . " " . $this->Users_model->get_one($data->created_by)->last_name;
+          $created_by =  $this->Users_model->get_one($data->created_by)->first_name ? $this->Users_model->get_one($data->created_by)->first_name . " " . $this->Users_model->get_one($data->created_by)->last_name :$data->created_by;
         $assigned_to = $this->Users_model->get_one($data->assign_to)->first_name . " " . $this->Users_model->get_one($data->assign_to)->last_name;
 
           $ticket_status_class = "label-danger";

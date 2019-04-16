@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
   | a PHP script and you can easily do that on your own.
   |
  */
-$config['base_url'] = "https://esl.pro-kazi.com";
+$config['base_url'] = "http://localhost:4040";
 //
 
 //try to catch the base url in case of undefined base url 

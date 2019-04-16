@@ -27,10 +27,12 @@
 
             }
 
-            else{
-                echo "<i class='fa fa-paperclip pull-left font-16'></i>";
+            else {
+                if ($comment->files) {
+                    echo "<i class='fa fa-paperclip pull-left font-16'></i>";
                     echo anchor(get_uri("tickets/downloadComment/" . $comment->id), 'Download', array("class" => "pull-right", "title" => "Download"));
                 }
+            }
 
             ?>
 

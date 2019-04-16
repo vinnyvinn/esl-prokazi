@@ -22,7 +22,7 @@
 
         $("#ict_reports_support_entries-table").appTable({
             source: '<?php echo_uri("ict_reports/support_tickets_list_data") ?>',
-            <?php if ($this->login_user->is_admin || $this->Team_model->is_ict_member()) { ?>
+            <?php if ($this->login_user->is_admin) { ?>
             radioButtons: [{text: 'System', name: "ticket_type_id", value: "1", isChecked: true}, {text: 'Email', name: "ticket_type_id", value: "2", isChecked: false}, {text: 'Call', name: "ticket_type_id", value: "3", isChecked: false}, {text: 'Visit', name: "ticket_type_id", value: "6", isChecked: false}],
             <?php } ?>
             columns: [
