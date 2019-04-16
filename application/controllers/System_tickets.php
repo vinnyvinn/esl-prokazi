@@ -27,7 +27,7 @@ class System_tickets extends CI_Controller {
             //"team_id" => $this->input->post('team_id'),
             "labels" => 'High'
         );
-
+        $file_name ='';
         if(isset($_FILES['image'])){
             $errors= array();
             $file_name = $_FILES['image']['name'];
