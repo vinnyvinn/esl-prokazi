@@ -352,14 +352,23 @@ public function  entries_details()
         
         public function support_tickets_list_data() {
 
-          //if ($this->login_user->is_admin) {
-            //$id = $this->input->post("ticket_type_id");
+          if ($this->login_user->is_admin) {
+            $id = $this->input->post("ticket_type_id");
 
-          //  $list_data = $this->Support_entries_model->get_all_where(array("ticket_type_id" => $id, "deleted" => 0))->result();
-          //} else {
-            //$list_data = $this->Support_entries_model->get_all_where(array("created_by" => $this->login_user->id, "deleted" => 0))->result();
-          //}
- $list_data = $this->Support_entries_model->get_all_where(array("deleted" => 0))->result();
+            if($id==1){
+
+                $list_data = $this->Support_entries_model->get_all_where(array("ticket_id" =>'system', "deleted" => 0))->result();
+            }
+            else{
+                $list_data = $this->Support_entries_model->get_all_where(array("ticket_type_id" =>$id, "deleted" => 0))->result();
+            }
+
+
+           // $list_data = $this->Support_entries_model->get_all_where(array("ticket_type_id" => $id, "deleted" => 0))->result();
+          } else {
+            $list_data = $this->Support_entries_model->get_all_where(array("created_by" => $this->login_user->id, "deleted" => 0))->result();
+          }
+         //$list_data = $this->Support_entries_model->get_all_where(array("deleted" => 0))->result();
 
           $result = array();
           foreach ($list_data as $data) {
