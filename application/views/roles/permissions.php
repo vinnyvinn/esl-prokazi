@@ -511,6 +511,24 @@
                     </div>
                     <div>
                         <?php
+                        echo form_checkbox("can_mark_ticket_done", "1", $can_mark_ticket_done ? true : false, "id='can_mark_ticket_done'");
+                        ?>
+                        <label for="can_mark_ticket_done"><?php echo lang("can_mark_ticket_done"); ?></label>
+                    </div>
+                    <div>
+                        <?php
+                        echo form_checkbox("can_mark_ticket_solved", "1", $can_mark_ticket_solved ? true : false, "id='can_mark_ticket_solved'");
+                        ?>
+                        <label for="can_mark_ticket_solved"><?php echo lang("can_mark_ticket_solved"); ?></label>
+                    </div>
+                    <div>
+                        <?php
+                        echo form_checkbox("can_mark_ticket_closed", "1", $can_mark_ticket_closed ? true : false, "id='can_mark_ticket_closed'");
+                        ?>
+                        <label for="can_mark_ticket_closed"><?php echo lang("can_mark_ticket_closed"); ?></label>
+                    </div>
+                    <div>
+                        <?php
                         echo form_checkbox("can_view_assets", "1", $can_view_assets ? true : false, "id='can_view_assets'");
                         ?>
                         <label for="can_view_assets"><?php echo lang("can_view_assets"); ?></label>

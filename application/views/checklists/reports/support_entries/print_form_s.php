@@ -1,5 +1,6 @@
 <?php
 
+
 function secondsToTime($seconds) {
     $dtF = new \DateTime('@0');
     $dtT = new \DateTime("@$seconds");
@@ -37,8 +38,8 @@ function secondsToTime($seconds) {
 
 
             <td><?php echo $entry->title ?></td>
-            <td><?php echo $entry->ticket_type ?></td>
-            <td><?php echo $entry->username ?></td>
+            <td><?php echo $entry->ticket_id ?></td>
+            <td><?php echo $entry->created_by ?></td>
             <td><?php echo $entry->assign_to ? $this->db->query("select * from users where id={$entry->assign_to}")->row()->first_name.' '.$this->db->query("select * from users where id={$entry->assign_to}")->row()->last_name : ''?></td>
             <td><?php $created = new DateTime($entry->created_at);
                 echo $created->format('d/m/y'); ?></td>

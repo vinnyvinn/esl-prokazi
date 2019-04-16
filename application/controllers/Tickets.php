@@ -817,6 +817,17 @@ private function _make_row($data) {
           download_app_files(get_setting("support_file_path"), $filo);
         }
 
+    public function downloadComment($id)
+    {
+        $this->load->helper('download');
+        $filo = $this->db->query("SELECT * FROM support_comments WHERE id=$id")->row()->files;
+        //file path
+        $file = 'files/support_entries/'.$filo;
+
+        //download file from directory
+        force_download($file, NULL);
+
+        }
 
         public function observation_modal() {
           validate_submitted_data(array(

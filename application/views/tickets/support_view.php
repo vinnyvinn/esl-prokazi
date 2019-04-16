@@ -25,19 +25,26 @@
                             <li role="presentation">
                                 <?php
                                 echo modal_anchor(get_uri("tickets/third_partyusers_modal_form"), "<i class='fa fa-stack-overflow'></i> Add to Third Party", array( "title" => "Add to Third Party", "data-post-view" => "details", "data-post-id" => $ticket_info->id));
-                                
+
                                 echo modal_anchor(get_uri("tickets/knowledge_base_modal_form"), "<i class='fa fa-stethoscope'></i> Add knowledge base", array( "title" => "Add knowledge base", "data-post-view" => "details", "data-post-id" => $ticket_info->id));
-                                 
-                                 echo anchor(get_uri("tickets/ticket_solved_email/".$ticket_info->id), "<i class='fa fa-stack-exchange'></i> Mark as Done", array( "title" => "Mark as Done", "data-post-view" => "details", "data-post-id" => $ticket_info->id));
-                                
-                                  echo anchor(get_uri("ticket_types/add_mark_solved/".$ticket_info->id), "<i class='fa fa-stack-exchange'></i> Mark as Solved", array( "title" => "Mark as Solved", "data-post-view" => "details", "data-post-id" => $ticket_info->id));
+                                if (get_array_value($this->login_user->permissions,"can_mark_ticket_done") ==1){
+                                    echo anchor(get_uri("tickets/ticket_solved_email/".$ticket_info->id), "<i class='fa fa-stack-exchange'></i> Mark as Done", array( "title" => "Mark as Done", "data-post-view" => "details", "data-post-id" => $ticket_info->id));
+                                }
+
+                                if (get_array_value($this->login_user->permissions,"can_mark_ticket_solved") ==1){
+                                    echo anchor(get_uri("ticket_types/add_mark_solved/".$ticket_info->id), "<i class='fa fa-stack-exchange'></i> Mark as Solved", array( "title" => "Mark as Solved", "data-post-view" => "details", "data-post-id" => $ticket_info->id));
+                                }
+
                                ?>
                             </li>
 
 
-                            <?php if ($ticket_info->status === "open" ) { ?>
+                            <?php if ($ticket_info->status === "open" ) {
+
+                                if (get_array_value($this->login_user->permissions,"can_mark_ticket_closed") ==1){?>
+
                               <li role="presentation"><?php echo anchor(get_uri("ticket_types/add_mark_closed/".$ticket_info->id), "<i class='fa fa-check-circle'></i> " . lang('mark_as_closed'), array("class" => "", "title" => 'Add Comment Before Closing', "data-reload-on-success" => "1")); ?> </li>
-                          <?php }?>
+                          <?php } }?>
                     </ul>
                 </span>
 

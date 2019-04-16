@@ -100,39 +100,68 @@ function assign_modal($ticket_id){
 }
 
 function assign_ticket(){
+
     $email = $this->input->post('assign_to');
     $tk_id = $this->input->post('id');
-    $tickets = $this->db->query("SELECT support_entries.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM support_entries
+    $name=$this->db->query("SELECT email,id,CONCAT(first_name,' ',last_name) as username FROM users WHERE email= '$email'")->row_array();
+    $assign_to='';
+    $sender = '';
+
+    $check_ticket = $this->db->query("SELECT * FROM support_entries where id={$tk_id}")->row();
+    if($check_ticket->ticket_id=='system'){
+
+        $assign_to = array("email" => $check_ticket->email ,
+            "username" => $check_ticket->created_by,
+            "ticket_id" => $tk_id,
+            'created_at' => date('Y/m/d'),
+            'ticket_title' => $check_ticket->title,
+            'created_by' => $this->login_user->first_name .' '.$this->login_user->last_name,
+            'ticket_url' => get_uri("tickets/view_support/".$tk_id),
+        );
+
+        $sender = array("email" => $check_ticket->email ,
+            "assign_to" =>$name['username'],
+            "ticket_id" => $tk_id,
+            'created_at' => date('Y/m/d'),
+            'username' => $check_ticket->created_by,
+            'email_user' => $check_ticket->email,
+            'ticket_url' => get_uri("tickets/view_support/".$tk_id),
+        );
+
+    }
+
+    else{
+        $tickets = $this->db->query("SELECT support_entries.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM support_entries
      LEFT JOIN users ON users.id = support_entries.created_by
      where support_entries.id=$tk_id")->row();
-    $name=$this->db->query("SELECT email,id,CONCAT(first_name,' ',last_name) as username FROM users WHERE email= '$email'")->row_array();
+
+       $assign_to = array("email" => $email ,
+            "username" => $name['username'],
+            "ticket_id" => $this->input->post('id'),
+            'created_at' => date('Y/m/d'),
+            'ticket_title' => $tickets->title,
+            'created_by' => $this->login_user->first_name .' '.$this->login_user->last_name,
+            'ticket_url' => get_uri("tickets/view_support/".$this->input->post('id')),
+        );
+
+
+
+        $sender = array("email" => $email ,
+            "assign_to" => $name['username'],
+            "ticket_id" => $this->input->post('id'),
+            'created_at' => date('Y/m/d'),
+            'username' => $tickets->username,
+            'email_user' => $tickets->email,
+            'ticket_url' => get_uri("tickets/view_support/".$this->input->post('id')),
+        );
+
+    }
 
     $update_user = array(
-     'id' => $this->input->post('id'),
-     'assign_to' => $name['id']
-      );
-
+        'id' => $this->input->post('id'),
+        'assign_to' => $name['id']
+    );
     $this->Support_entries_model->update_user($update_user);
-
-    $assign_to = array("email" => $email ,
-      "username" => $name['username'],
-       "ticket_id" => $this->input->post('id'),
-       'created_at' => date('Y/m/d'),
-       'ticket_title' => $tickets->title,
-      'created_by' => $this->login_user->first_name .' '.$this->login_user->last_name,
-       'ticket_url' => get_uri("tickets/view_support/".$this->input->post('id')),
-   );
-
-
-    $sender = array("email" => $email ,
-       "assign_to" => $name['username'],
-       "ticket_id" => $this->input->post('id'),
-       'created_at' => date('Y/m/d'),
-       'username' => $tickets->username,
-       'email_user' => $tickets->email,
-       'ticket_url' => get_uri("tickets/view_support/".$this->input->post('id')),
-   );
-
 
   $this->_mail_ict_member($assign_to);
   $this->_mail_ticket_owner($sender);
