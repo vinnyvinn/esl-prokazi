@@ -40,7 +40,7 @@ public function  entries_details()
 
 
     $view_data['dates'] = array('from' => $this->input->post('start_date'), 'to' => $this->input->post('end_date'));
-    $t_ks = $this->db->query("SELECT * FROM ticket_types where id={$this->input->post('ticket')}")->row()->title;
+    $t_ks = $this->db->query("SELECT * FROM ticket_types where id={$this->input->post('ticket')}")->row();
 
     if ($t_ks == 'System') {
 
@@ -366,6 +366,7 @@ public function  entries_details()
 
            // $list_data = $this->Support_entries_model->get_all_where(array("ticket_type_id" => $id, "deleted" => 0))->result();
           } else {
+
             $list_data = $this->Support_entries_model->get_all_where(array("created_by" => $this->login_user->id, "deleted" => 0))->result();
           }
          //$list_data = $this->Support_entries_model->get_all_where(array("deleted" => 0))->result();
