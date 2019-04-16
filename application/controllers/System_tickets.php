@@ -46,7 +46,7 @@ class System_tickets extends CI_Controller {
             "ticket_id" => $ticket_id,
             "created_by" => $ticket_data['created_by'],
             "created_at" => $now,
-            "files" => $files_data
+            "files" =>$file_name ?  $files_data : ''
         );
 
         $this->Support_comments_model->save($comment_data);

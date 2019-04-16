@@ -61,6 +61,8 @@
                 <?php $this->load->view("tickets/support_row", array("comment" => $comment)); ?>
             <?php } ?>
 
+
+
             <div id="comment-form-container" class="pr15">
                 <?php echo form_open(get_uri("tickets/save_support"), array("id" => "comment-form", "class" => "general-form", "role" => "form")); ?>
                 <div class="p15 box">
