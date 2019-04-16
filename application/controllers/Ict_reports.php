@@ -35,11 +35,22 @@ class Ict_reports extends Pre_loader {
         $this->template->rander("checklists/reports/support_entries/form",$view_data);
 
     }
-public function  entries_details(){
+public function  entries_details()
+{
 
 
-       $view_data['dates'] = array('from' =>$this->input->post('start_date'),'to'=>$this->input->post('end_date'));
-    $results = $this->input->post('ticket') == 0 ? $this->db->query("SELECT support_entries.*,CONCAT(users.first_name,' ',users.last_name) as username,ticket_types.title as ticket_type FROM support_entries
+    $view_data['dates'] = array('from' => $this->input->post('start_date'), 'to' => $this->input->post('end_date'));
+    $t_ks = $this->db->query("SELECT * FROM ticket_types where id={$this->input->post('ticket')}")->row()->title;
+
+    if ($t_ks == 'System') {
+
+        $results = $this->db->query("SELECT * FROM support_entries WHERE ticket_id='system' AND (created_at BETWEEN '{$this->input->post('start_date')}' AND '{$this->input->post('end_date')}')")->result();
+        $view_data['entries'] = $results;
+
+        $this->template->rander('checklists/reports/support_entries/entries_index_s', $view_data);
+    } else {
+
+        $results = $this->input->post('ticket') == 0 ? $this->db->query("SELECT support_entries.*,CONCAT(users.first_name,' ',users.last_name) as username,ticket_types.title as ticket_type FROM support_entries
        LEFT JOIN  users ON users.id=support_entries.created_by 
        LEFT JOIN ticket_types ON ticket_types.id=support_entries.ticket_type_id WHERE (support_entries.created_at BETWEEN '{$this->input->post('start_date')}' AND '{$this->input->post('end_date')}')
        ORDER BY support_entries.created_at DESC")->result() : $this->db->query("SELECT support_entries.*,CONCAT(users.first_name,' ',users.last_name) as username,ticket_types.title as ticket_type FROM support_entries
@@ -48,8 +59,10 @@ public function  entries_details(){
        AND ticket_types.id like '%{$this->input->post('ticket')}%'
        ORDER BY support_entries.created_at DESC")->result();
 
-       $view_data['entries'] = $results;
-      $this->template->rander('checklists/reports/support_entries/entries_index',$view_data);
+        $view_data['entries'] = $results;
+
+        $this->template->rander('checklists/reports/support_entries/entries_index', $view_data);
+    }
 }
 
     public function print_entries($from,$to)
@@ -59,6 +72,14 @@ public function  entries_details(){
        LEFT JOIN ticket_types ON ticket_types.id=support_entries.ticket_type_id WHERE (support_entries.created_at BETWEEN '$from' AND '$to')")->result();
         $this->load->library('pdf2');
         $this->pdf2->load_view('checklists/reports/support_entries/print_form', $view_data);
+        $this->pdf2->render();
+        $this->pdf2->stream('tickets.pdf');
+    }
+    public function print_entries_s($from,$to)
+    {
+        $view_data['entries'] = $this->db->query("SELECT * FROM support_entries WHERE ticket_id='system' AND (created_at BETWEEN '{$from}' AND '{$to}')")->result();
+        $this->load->library('pdf2');
+        $this->pdf2->load_view('checklists/reports/support_entries/print_form_s', $view_data);
         $this->pdf2->render();
         $this->pdf2->stream('tickets.pdf');
     }
@@ -81,8 +102,10 @@ public function  entries_details(){
         $objPHPExcel->getActiveSheet()->SetCellValue('E1', 'Opened Date');
         $objPHPExcel->getActiveSheet()->SetCellValue('F1', 'Closed Date');
         $objPHPExcel->getActiveSheet()->SetCellValue('G1', 'Duration');
+        $objPHPExcel->getActiveSheet()->SetCellValue('H1', 'Comments');
         // set Row
         $rowCount = 2;
+
         foreach ($empInfo as $element) {
             $created = new DateTime($element->created_at);
             $created_t=$created->format('d/m/y');
@@ -95,6 +118,13 @@ public function  entries_details(){
                 $d_t =(($end_date/(60*60)) - ($start_date/(60*60)));
                 $duration= ceil($d_t) .'hrs';
             }
+            $comments = [];
+            $commentss = $this->db->query("SELECT * FROM support_comments where ticket_id={$element->id}")->result();
+            if ($commentss){
+                foreach ($commentss as $comm){
+                    $comments[]=$comm->description;
+                }
+            }
             $objPHPExcel->getActiveSheet()->SetCellValue('A' . $rowCount, $element->title);
             $objPHPExcel->getActiveSheet()->SetCellValue('B' . $rowCount, $element->ticket_type);
             $objPHPExcel->getActiveSheet()->SetCellValue('C' . $rowCount, $element->username);
@@ -102,6 +132,69 @@ public function  entries_details(){
             $objPHPExcel->getActiveSheet()->SetCellValue('E' . $rowCount, $created_t);
             $objPHPExcel->getActiveSheet()->SetCellValue('F' . $rowCount, $closed_date_t);
             $objPHPExcel->getActiveSheet()->SetCellValue('G' . $rowCount, $duration);
+            $objPHPExcel->getActiveSheet()->SetCellValue('H' . $rowCount, implode(',',$comments));
+            $rowCount++;
+        }
+//        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+//        $objWriter->save(ROOT_UPLOAD_IMPORT_PATH.$fileName);
+//        // download file
+//        header("Content-Type: application/vnd.ms-excel");
+//        redirect(HTTP_UPLOAD_IMPORT_PATH.$fileName);
+
+        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
+        $objWriter->save($fileName);
+        // download file
+        header("Content-Type: application/vnd.ms-excel");
+        redirect(site_url().$fileName);
+    }
+
+    public function createXLS_s($from,$to) {
+        // create file name
+        $fileName = 'tickets-'.time().'.xlsx';
+        // load excel library
+        $this->load->library('excel');
+        $empInfo =  $this->db->query("SELECT * FROM support_entries WHERE ticket_id='system' AND (created_at BETWEEN '{$from}' AND '{$to}')")->result();
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->setActiveSheetIndex(0);
+        // set Header
+        $objPHPExcel->getActiveSheet()->SetCellValue('A1', 'Title');
+        $objPHPExcel->getActiveSheet()->SetCellValue('B1', 'Ticket type');
+        $objPHPExcel->getActiveSheet()->SetCellValue('C1', 'Created By');
+        $objPHPExcel->getActiveSheet()->SetCellValue('D1', 'Assigned To');
+        $objPHPExcel->getActiveSheet()->SetCellValue('E1', 'Opened Date');
+        $objPHPExcel->getActiveSheet()->SetCellValue('F1', 'Closed Date');
+        $objPHPExcel->getActiveSheet()->SetCellValue('G1', 'Duration');
+        $objPHPExcel->getActiveSheet()->SetCellValue('H1', 'Comments');
+        // set Row
+        $rowCount = 2;
+
+        foreach ($empInfo as $element) {
+            $created = new DateTime($element->created_at);
+            $created_t=$created->format('d/m/y');
+            $closed_date = new DateTime($element->created_at);
+            $closed_date_t=$closed_date->format('d/m/y');
+            $duration = '';
+            $start_date=strtotime($element->created_at);
+            $end_date=strtotime($element->closed_date);
+            if($end_date) {
+                $d_t =(($end_date/(60*60)) - ($start_date/(60*60)));
+                $duration= ceil($d_t) .'hrs';
+            }
+            $comments = [];
+            $commentss = $this->db->query("SELECT * FROM support_comments where ticket_id={$element->id}")->result();
+            if ($commentss){
+                foreach ($commentss as $comm){
+                    $comments[]=$comm->description;
+                }
+            }
+            $objPHPExcel->getActiveSheet()->SetCellValue('A' . $rowCount, $element->title);
+            $objPHPExcel->getActiveSheet()->SetCellValue('B' . $rowCount, $element->ticket_id);
+            $objPHPExcel->getActiveSheet()->SetCellValue('C' . $rowCount, $element->created_by);
+            $objPHPExcel->getActiveSheet()->SetCellValue('D' . $rowCount, $element->assign_to ? $this->db->query("select * from users where id={$element->assign_to}")->row()->first_name.' '.$this->db->query("select * from users where id={$element->assign_to}")->row()->last_name : '');
+            $objPHPExcel->getActiveSheet()->SetCellValue('E' . $rowCount, $created_t);
+            $objPHPExcel->getActiveSheet()->SetCellValue('F' . $rowCount, $closed_date_t);
+            $objPHPExcel->getActiveSheet()->SetCellValue('G' . $rowCount, $duration);
+            $objPHPExcel->getActiveSheet()->SetCellValue('H' . $rowCount, implode(',',$comments));
             $rowCount++;
         }
 //        $objWriter = new PHPExcel_Writer_Excel2007($objPHPExcel);
@@ -1064,6 +1157,7 @@ public function  entries_details(){
     return array($data->id, $this->SAGE_DB()->get_where("_btblFAAsset", array("idAssetNo" => $data->sage_item_id))->row_array()['cAssetDesc'], $data->performed_by != 0 ? $this->Users_model->get_one($data->performed_by)->first_name . " " . $this->Users_model->get_one($data->performed_by)->last_name : $status, date("dS M Y",strtotime($data->maintainance_date)), $status);
   }
 
+
   public function support_tickets_save()
   {
 
@@ -1097,7 +1191,8 @@ public function  entries_details(){
 
       $target_path = get_setting("support_file_path");
       $files_data = move_files_from_temp_dir_to_permanent_dir($target_path, "ticket");
-
+var_dump($files_data);
+exit();
 
       $ticket_id = $this->Support_entries_model->save($ticket_data, $id);
       $user_id = $this->db->query("SELECT user_ref_id from support_entries WHERE id={$ticket_id}")->row()->user_ref_id;
@@ -1262,6 +1357,7 @@ public function _support_ticket_created_mail($data) {
   $message = $this->parser->parse_string($email_template->message, $parser_data, true);
   send_app_mail($data['send_to'], $email_template->subject, $message);
 }
+
     public function _support_ticket_sender_mail($data) {
 
         $email_template = $this->Email_templates_model->get_final_template("ticket_created");
@@ -1276,5 +1372,6 @@ public function _support_ticket_created_mail($data) {
         $message = $this->parser->parse_string($email_template->message, $parser_data, true);
         send_app_mail($data['sender_email'], $email_template->subject, $message);
     }
+
 
 }

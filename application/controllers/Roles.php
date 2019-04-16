@@ -151,6 +151,9 @@ class roles extends Pre_loader
             $view_data['can_view_assets_disposals'] = get_array_value($permissions, "can_view_assets_disposals");
             $view_data['can_view_support_reports'] = get_array_value($permissions, "can_view_support_reports");
             $view_data['can_view_third_level_reports'] = get_array_value($permissions, "can_view_third_level_reports");
+            $view_data['can_mark_ticket_done'] = get_array_value($permissions, "can_mark_ticket_done");
+            $view_data['can_mark_ticket_solved'] = get_array_value($permissions, "can_mark_ticket_solved");
+            $view_data['can_mark_ticket_closed'] = get_array_value($permissions, "can_mark_ticket_closed");
 
             $view_data['can_access_team'] = get_array_value($permissions, "can_access_team");
             $view_data['can_access_team_members'] = get_array_value($permissions, "can_access_team_members");
@@ -337,6 +340,9 @@ class roles extends Pre_loader
         $can_view_assets_disposals = $this->input->post('can_view_assets_disposals');
         $can_view_support_reports = $this->input->post('can_view_support_reports');
         $can_view_third_level_reports = $this->input->post('can_view_third_level_reports');
+        $can_mark_ticket_closed = $this->input->post('can_mark_ticket_closed');
+        $can_mark_ticket_solved = $this->input->post('can_mark_ticket_solved');
+        $can_mark_ticket_done = $this->input->post('can_mark_ticket_done');
 
         $can_access_defferals = $this->input->post('can_access_defferals');
         $can_access_project_defferals = $this->input->post('can_access_project_defferals');
@@ -442,6 +448,9 @@ class roles extends Pre_loader
             "can_access_income_expenses" => $can_access_income_expenses,
             "can_view_support_reports" => $can_view_support_reports,
             "can_view_third_level_reports" => $can_view_third_level_reports,
+            "can_mark_ticket_closed" =>$can_mark_ticket_closed,
+            "can_mark_ticket_solved" =>$can_mark_ticket_solved,
+            "can_mark_ticket_done" =>$can_mark_ticket_done,
             "can_view_checklists" => $can_view_checklists,
             "can_view_support_tickets" => $can_view_support_tickets,
             "can_view_checklists_reports" => $can_view_checklists_reports,

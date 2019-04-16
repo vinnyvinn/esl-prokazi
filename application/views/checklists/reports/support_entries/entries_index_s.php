@@ -1,13 +1,3 @@
-<?php
-
-//function secondsToTime($seconds) {
-//    $dtF = new \DateTime('@0');
-//    $dtT = new \DateTime("@$seconds");
-//    return $dtF->diff($dtT)->format('%a days, %h hours, %i minutes');
-//}
-//
-//?>
-
 <?php echo form_open('"id" = "create-parts-form", "class" = "general-form", "role" = "form"'); ?>
 <div class="modal-body clearfix">
     <div class="panel panel-default">
@@ -16,8 +6,8 @@
             <?php
 
             if ($entries) {
-                echo anchor(get_uri("ict_reports/print_entries/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-pdf-o'></i> " . 'Export pdf', array("class" => "btn btn-success pull-right rq", "title" => lang('print_report')));
-                echo anchor(get_uri("ict_reports/createXLS/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-excel-o'></i> " . 'Export Excel', array("class" => "btn btn-success pull-right rq walla", "title" => lang('print_report')));
+                echo anchor(get_uri("ict_reports/print_entries_s/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-pdf-o'></i> " . 'Export pdf', array("class" => "btn btn-success pull-right rq", "title" => lang('print_report')));
+                echo anchor(get_uri("ict_reports/createXLS_s/" . $dates['from'] . '/' . $dates['to']), "<i class='fa fa-file-excel-o'></i> " . 'Export Excel', array("class" => "btn btn-success pull-right rq walla", "title" => lang('print_report')));
             } ?>
         </div>
     </div>
@@ -44,8 +34,8 @@
                         <tr>
                             <td><?php echo $entry->id ?></td>
                             <td><?php echo $entry->title ?></td>
-                            <td><?php echo $entry->ticket_type ?></td>
-                            <td><?php echo $entry->username ?></td>
+                            <td><?php echo $entry->ticket_id ?></td>
+                            <td><?php echo $entry->created_by ?></td>
                             <td><?php echo $entry->assign_to ? $this->db->query("select * from users where id={$entry->assign_to}")->row()->first_name.' '.$this->db->query("select * from users where id={$entry->assign_to}")->row()->last_name : ''?></td>
                             <td><?php $created = new DateTime($entry->created_at);
                                 echo $created->format('d/m/y'); ?></td>
