@@ -7,3 +7,4 @@ vuejsfiles/node_modules
 /.buildpath
 /.project
 application/logs
+application/config/config.php
