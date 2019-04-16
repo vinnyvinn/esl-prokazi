@@ -1,9 +1,7 @@
 <?php
-if (!defined('BASEPATH'))
-    exit('No direct script access allowed');
-require_once("Pre_loader.php");
 
-class System_tickets extends Pre_loader{
+
+class System_tickets extends CI_Controller {
     function __construct()
     {
         parent::__construct();
