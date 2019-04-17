@@ -135,21 +135,23 @@ public function save_changes($asset_id){
 
 
    }
-  $to = $this->db->query("SELECT * FROM users WHERE id=$custodian")->row_array();
-  $hr = $this->db->query("SELECT * FROM users WHERE job_title like '%Corporate Support : HR & Admin Manager%'")->row_array();
-  $email_asset = array(
-    'asset' => $this->input->post('title'),
-    'to' => $to['first_name'] .' '.$to['last_name'],
-    'to_email' => $to['email'],
-    'from' => $this->login_user->first_name. ' '.$this->login_user->last_name,
-    'from_email' => $this->login_user->email,
-    'cc' => $hr['first_name'] .' '.$hr['last_name'],
-    'cc_email' => $hr['email'],
-    'asset_id' => $this->input->post('id'),
-    'asset_url' => get_uri('inventory_assets/view/'.$this->input->post('id')),
-  );
+  if($custodian) {
+      $to = $this->db->query("SELECT * FROM users WHERE id=$custodian")->row_array();
+      $hr = $this->db->query("SELECT * FROM users WHERE job_title like '%Corporate Support : HR & Admin Manager%'")->row_array();
+      $email_asset = array(
+          'asset' => $this->input->post('title'),
+          'to' => $to['first_name'] . ' ' . $to['last_name'],
+          'to_email' => $to['email'],
+          'from' => $this->login_user->first_name . ' ' . $this->login_user->last_name,
+          'from_email' => $this->login_user->email,
+          'cc' => $hr['first_name'] . ' ' . $hr['last_name'],
+          'cc_email' => $hr['email'],
+          'asset_id' => $this->input->post('id'),
+          'asset_url' => get_uri('inventory_assets/view/' . $this->input->post('id')),
+      );
 
-  $this->_mail_asset($email_asset);
+      $this->_mail_asset($email_asset);
+  }
   return redirect(base_url('inventory_assets'));
 }
 public function view($id){
@@ -471,7 +473,7 @@ public function print_report($from,$to){
 
         $object->setActiveSheetIndex(0);
 
-        $table_columns = array("Code", "Title", "Model No", "Serial No","Custodian","Date");
+        $table_columns = array("Code", "Title","Category","Model No", "Serial No","Department","Supplier","Description","Custodian","Date");
         $column = 0;
 
         foreach($table_columns as $field)
@@ -491,10 +493,14 @@ public function print_report($from,$to){
         {
             $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->card_no);
             $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->title);
-            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->model_no);
-            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->serial_no);
-            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, $row->username);
-            $object->getActiveSheet()->setCellValueByColumnAndRow(5, $excel_row, date('d-m-Y',strtotime($row->updated_at)));
+            $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->category);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(3, $excel_row, $row->model_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(4, $excel_row, $row->serial_no);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(5, $excel_row, $row->designation);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(6, $excel_row, $row->username);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(7, $excel_row, $row->title);
+            $object->getActiveSheet()->setCellValueByColumnAndRow(8, $excel_row, $row->custodian ? $this->db->query("SELECT CONCAT(first_name,' ',last_name) as nickname FROM users WHERE id={$row->custodian}")->row()->nickname :'');
+            $object->getActiveSheet()->setCellValueByColumnAndRow(9, $excel_row, date('d-m-Y',strtotime($row->updated_at)));
             $excel_row++;
         }
 

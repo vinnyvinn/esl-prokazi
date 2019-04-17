@@ -16,6 +16,7 @@ let columns = [
         name: 'typeval',
         title: 'Type',
     },
+       
     {
         name: '__slot:actions',
         dataClass: 'center aligned',
