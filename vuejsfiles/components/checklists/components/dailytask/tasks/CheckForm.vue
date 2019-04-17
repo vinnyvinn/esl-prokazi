@@ -13,7 +13,7 @@
                             <td>#</td>
                             <td style="width: 300px; word-wrap: break-word">Item</td>
                             <td>Yes</td>
-                            <td style="width: 70px; word-wrap: break-word;text-align: center">Pending/Error/Nooooo</td>
+                            <td style="width: 70px; word-wrap: break-word;text-align: center">Pending/Error/No</td>
                             <td>Comment</td>
                             </thead>
                             <tbody>
@@ -109,7 +109,7 @@
                 if (this.checklistitems.length === this.items_form.check.length) {
                     this.submitdata();
                 } else {
-                    alert("You must check eithe yes or no on each item before submitting");
+                    alert("You must check either yes or no on each item before submitting");
                 }
             },
             submitdata(){

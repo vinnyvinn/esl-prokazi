@@ -88,20 +88,21 @@ class Checklist_daily_tasks extends Pre_loader{
             "performed_on" => date('Y-m-d'),
             "escalate_to" => $escalate_to,
         );
-        $user_id = $data['escalate_to'];
-        $p_by_id = $data['performed_by'];
-     $user = $this->db->query("SELECT CONCAT(first_name,' ',last_name) as username, email FROM users WHERE id= $user_id")->row();
-     $performer = $this->db->query("SELECT CONCAT(first_name,' ',last_name) as username, email FROM users WHERE id= $p_by_id")->row();
 
-         $email_data = array(
-           'performed_by' =>$performer->username,
-           'ref_no' => $data['ref_no'],
-           'performed_on' => $data['performed_on'],
-           'email' => $user->email,
-           'username' => $user->username,
-
-         );
          if($data['escalate_to']) {
+             $user_id = $data['escalate_to'];
+             $p_by_id = $data['performed_by'];
+             $user = $this->db->query("SELECT CONCAT(first_name,' ',last_name) as username, email FROM users WHERE id= $user_id")->row();
+             $performer = $this->db->query("SELECT CONCAT(first_name,' ',last_name) as username, email FROM users WHERE id= $p_by_id")->row();
+
+             $email_data = array(
+                 'performed_by' =>$performer->username,
+                 'ref_no' => $data['ref_no'],
+                 'performed_on' => $data['performed_on'],
+                 'email' => $user->email,
+                 'username' => $user->username,
+
+             );
              $this->_mail_tasks($email_data);
          }
         return $this->TblChecklistsTasks->save($data);

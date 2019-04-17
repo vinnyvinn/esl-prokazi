@@ -17,6 +17,10 @@ let columns = [
         title: 'Type',
     },
     {
+        name: 'ref_no',
+        title: 'Ref #',
+    },
+    {
         name: '__slot:actions',
         dataClass: 'center aligned',
         title: 'Actions'
