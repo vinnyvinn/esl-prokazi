@@ -9,7 +9,7 @@ class Announcements extends Pre_loader {
     function __construct() {
         parent::__construct();
         $this->init_permission_checker("announcement");
-    }
+     }
 
     //show announcements list
     function index() {
