@@ -25,7 +25,7 @@
             <div class="form-group">
               <label for="custodian">Custodian</label>
                   <select class="form-control" name="custodian" id="custodian">
-                      <option value="">--Choose Custodian--</option>
+                      <option>--Choose Custodian--</option>
                 <?php
                  foreach ($users as $user) {?>
                  <option value="<?php echo $user->id;?>"<?php if($user->id ==$assets->custodian) echo 'selected="selected"';?>><?php echo  ucfirst($user->first_name) .' '.ucfirst($user->last_name);?></option>;

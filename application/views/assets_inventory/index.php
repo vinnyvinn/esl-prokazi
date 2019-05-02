@@ -1,18 +1,25 @@
 <div class="panel panel-default">
-  <div class="panel-heading">Inventory Assets
+   <ul class="nav nav-pills">
+  <li><a href="<?php echo base_url('inventory_assets');?>" class="btn btn-primary">Inventory Assets</a></li>
+  <li><a href="<?php echo base_url('return_assets/issues')?>" class="btn btn-primary"><b>Issue Asset</b></a></li>
+  <li><a href="<?php echo base_url('return_assets');?>" class="btn btn-primary"><b>Return Asset</b></a></li>
 
+</ul>
 
-    <!-- Button trigger modal -->
+ 
 
-    <button class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myAssetModal">
+    <div id='content' class="tab-content">
+      <div class="tab-pane active" id="home">
+        <div class="panel panel-heading" style="margin: 0;margin-top: -25px">
+       <button class="btn btn-primary btn-sm pull-right" data-toggle="modal" data-target="#myAssetModal" style="margin-top: -20px;margin-left: 2px">
       Add new Inventory Asset
     </button>
-    <button class="btn btn-info btn-sm pull-right" id="newmenu">
+    <button class="btn btn-info btn-sm pull-right" id="newmenu" style="margin-top: -20px">
       Import Sage assets
     </button>
-  </div>
-
+    </div>
   <div class="panel-body">
+   
    <div class="row">
     <div class="col-sm-12">
       <table class="table table-striped table-bordered" id="jt" style="width: 100%">
@@ -25,9 +32,9 @@
            <th>Model NO</th>
            <th>Serial NO</th>
            <th>Category</th>
-             <th>Custodian</th>
-             <th>Location</th>
-            <th>Actions</th>
+           <th>Custodian</th>
+           <th>Location</th>
+           <th>Actions</th>
 
          </tr>
        </thead> 
@@ -46,11 +53,7 @@
                <td><?php echo $asset->username?></td>
                <td><?php echo $asset->location?></td>
              <td>
-                 <?php if($asset->status==1) {?>
-
-              <a href="<?php echo base_url('inventory_assets/view_form/'.$asset->id);?>" data-toggle="tooltip" data-placement="bottom" title="View Form" class="btn btn-info btn-xs"><span class="glyphicon glyphicon-eye-open"></a>
-                <?php }?>
-              <a href="<?php echo base_url('inventory_assets/edit/'.$asset->id);?>" data-toggle="tooltip" data-placement="bottom" title="Modify Asset" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></a>
+                <a href="<?php echo base_url('inventory_assets/edit/'.$asset->id);?>" data-toggle="tooltip" data-placement="bottom" title="Modify Asset" class="btn btn-primary btn-xs"><span class="glyphicon glyphicon-pencil"></a>
 
              </td>
           </tr>
@@ -61,6 +64,15 @@
    </div>
  </div>
 </div>
+
+</div>
+      <div class="tab-pane" id="profile">
+       <a href="<?php echo base_url('return_assets') ;?>">weqwed</a>
+      </div>
+     
+    </div> 
+
+
 </div>
 
 <link rel="stylesheet" href="<?php echo base_url();?>assets/bootstrap/css/bootstrap.min.css">
@@ -92,16 +104,16 @@
             <div class="col-sm-6">
              <div class="form-group">
               <label for="Code">Code No</label>
-              <input type="text" name="card_no" class="form-control" placeholder="Code No">
+              <input type="text" name="card_no" class="form-control" placeholder="Code No" required>
             </div>
             
             <div class="form-group">
               <label for="Purchase Date">Purchase Date</label>
-              <input type="text" name="purchase_date" id="purchase_date" class="form-control" placeholder="Purchase Date">
+              <input type="text" name="purchase_date" id="purchase_date" class="form-control" placeholder="Purchase Date" required>
             </div>
             <div class="form-group">
               <label for="Department">Department</label>
-              <input type="text" name="department" class="form-control" placeholder="Department">
+              <input type="text" name="department" class="form-control" placeholder="Department" required>
             </div>
             <div class="form-group">
               <label for="Supplier">Supplier</label>
@@ -125,15 +137,15 @@
           <div class="col-sm-6">
             <div class="form-group">
               <label for="model_no">Model No</label>
-              <input type="text" name="model_no" class="form-control" placeholder="Model No">
+              <input type="text" name="model_no" class="form-control" placeholder="Model No" required>
             </div>
             <div class="form-group">
               <label for="serial_no">Serial No</label>
-              <input type="text" name="serial_no" class="form-control" placeholder="Serial No">
+              <input type="text" name="serial_no" class="form-control" placeholder="Serial No" required>
             </div>
             <div class="form-group">
               <label for="location">Location</label>
-                <select class="form-control" name="location" id="location">
+                <select class="form-control" name="location" id="location" required>
                     <?php
                     foreach ($locations as $location) {
                         echo "<option value=\"". $location->cLocationDesc . "\">" . ucfirst($location->cLocationDesc) . "</option>";
@@ -143,15 +155,15 @@
             </div>
             <div class="form-group">
               <label for="Purchase Cost">Purchase Cost</label>
-              <input type="number" name="purchase_cost" class="form-control" step="0.01" placeholder="Purchase Cost">
+              <input type="number" name="purchase_cost" class="form-control" step="0.01" placeholder="Purchase Cost" required>
             </div>
              <div class="form-group">
               <label for="category">Category</label>
-              <input type="text" name="category" class="form-control" placeholder="Category No">
+              <input type="text" name="category" class="form-control" placeholder="Category No" required>
             </div>
             <div class="form-group">
               <label for="custodian">Custodian</label>
-              <select class="form-control" name="custodian" id="custodian">
+              <select class="form-control" name="custodian" id="custodian" required>
                 <option>-- SELECT CUSTODIAN --</option>
                 <?php
                 foreach ($users as $user) {
@@ -176,7 +188,16 @@
 </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<script type="text/javascript">
- setDatePicker('#purchase_date');
- $("#supplier,#custodian").select2();
+<link rel="stylesheet" href="<?php echo base_url();?>assets/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="<?php echo base_url();?>assets/js/datatable/css/dataTables.bootstrap.min.css">
+<script>
+
+    $(function () {
+        $('#jt').dataTable();
+
+
+
+    })
+    setDatePicker('#purchase_date');
+    $('#asset_id,#custodian,#supplier').select2();
 </script>
