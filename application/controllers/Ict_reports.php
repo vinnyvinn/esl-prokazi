@@ -995,9 +995,10 @@ public function  entries_details()
       $this->template->rander("checklists/maintenance/index_list",$view_data);
   }
   public function inventory_maintenance_modal_form() {
-
-    $view_data['ict_assets_dropdown'] = $this->SAGE_DB()->get_where("_btblFAAsset", array("iAssetTypeNo" => get_setting("iAssetTypeNo")))->result();
-    $view_data['assign_dropdown'] = $this->Users_model->get_all_where(array("user_type" => "staff", "deleted" => 0))->result();
+   
+    $view_data['ict_assets_dropdown'] = $this->db->query("SELECT * FROM inventory_assets")->result();
+    $view_data['assign_dropdown'] =  $this->Users_model->get_all_where(array("user_type" => "staff", "deleted" => 0))->result();
+    
     $view_data['excalation_dropdown'] = $this->Escalation_matrix_model->get_all_where(array("deleted" => 0))->result();
     $this->load->view("checklists/maintenance/modal_form", $view_data);
   }
@@ -1005,12 +1006,16 @@ public function  entries_details()
   public function inventory_maintenance_save() {
 
     $id = $this->input->post('id');
-
+  $ict_asset = $this->db->query("SELECT * FROM inventory_assets WHERE id={$this->input->post('ict_assets')}")->row();
+ 
     $data = array(
       "sage_item_id" => $this->input->post('ict_assets'),
       "maintainance_date" => $this->input->post('maintainance_date'),
       "assigned_id" => $this->input->post('assign'),
-      "excalation_id" => $this->input->post('excalation')
+      "excalation_id" => $this->input->post('excalation'),
+      "purchase_date" => $ict_asset->purchase_date,
+      "created_at" => date('d-m-Y'),
+      "updated_at" => date('d-m-Y')
     );
 
     $save_id = $this->Preventive_maintainance_model->save($data, $id);
@@ -1055,11 +1060,14 @@ public function  entries_details()
         $options .= js_anchor("<i class='fa fa-times fa-fw'></i>", array('title' => 'Delete Maintenance', "class" => "delete", "data-id" => $data->id, "data-action-url" => get_uri("ict_reports/inventory_maintenance_delete"), "data-action" => "delete"));
     }
      if($data->status == 0) {
-      $options .= js_anchor("<i class='fa fa-pencil'></i>", array('title' => 'Perform Task', "class" => "edit", "data-id" => $data->id, "data-action-url" => get_uri("ict_reports/perform_maintenance"), "data-action" => "delete"));
+        // modal_anchor(get_uri("ict_reports/perform_maintenance"), "<i class='fa fa-plus-circle'></i> " . "Perform Task", array("class" => "fa fa-pencil", "title" => "Perform Task"));
+
+      $options .= modal_anchor(get_uri("ict_reports/perform_maintenance/".$data->id), "<i class='fa fa-pencil
+        '></i> ", array("class" => "btn btn-default btn-xs", "title" => "Perform Task","data-id" => $data->id));
           // $options .= js_anchor("<i class='fa fa-times fa-fw'></i>", array('title' => 'Escalate Task', "class" => "delete", "data-id" => $data->id, "data-action-url" => get_uri("ict_reports/escalate_maintenance"), "data-action" => "delete"));
     }
 
-    return array($data->id, $data->sage_item_id, $this->Users_model->get_one($data->assigned_id)->first_name . " " . $this->Users_model->get_one($data->assigned_id)->last_name, $this->Escalation_matrix_model->get_one($data->excalation_id)->escalation_matrix, $status, date("dS M Y",strtotime($data->maintainance_date)), $options);
+    return array($data->id, $this->db->query("SELECT * FROM inventory_assets where id={$data->sage_item_id}")->row()->title, $this->Users_model->get_one($data->assigned_id)->first_name . " " . $this->Users_model->get_one($data->assigned_id)->last_name, $this->Escalation_matrix_model->get_one($data->excalation_id)->escalation_matrix, $status, date("dS M Y",strtotime($data->maintainance_date)), $options);
   }
    public function print_asset_form(){
        $view_data['assets_maintenance'] = $this->db->query("SELECT preventive_maintainance.*,CONCAT(users.first_name,' ',users.last_name) as username FROM preventive_maintainance
@@ -1107,17 +1115,38 @@ public function  entries_details()
         header('Content-Disposition: attachment;filename="Assets Maintenance Data.xls"');
         $object_writer->save('php://output');
 }
- public function perform_maintenance() {
+ public function perform_maintenance($id) {
+ 
 
-    $id = $this->input->post('id');
+    // $save_id = $this->Preventive_maintainance_model->update_where(array("status" => 1, "performed_by" => $this->login_user->id), array("id" => $id));
 
-    $save_id = $this->Preventive_maintainance_model->update_where(array("status" => 1, "performed_by" => $this->login_user->id), array("id" => $id));
+    // if ($save_id) {
+    //   echo json_encode(array("success" => true, 'message' => lang('record_saved')));
+    // } else {
+    //   echo json_encode(array("success" => false, 'message' => lang('error_occurred')));
+    // }
+ 
+     $view_data['asset'] =$this->db->query("SELECT inventory_assets.*,preventive_maintainance.*,inventory_assets.purchase_date as p,inventory_assets.id as asset_id FROM preventive_maintainance
+        LEFT JOIN inventory_assets ON preventive_maintainance.sage_item_id=inventory_assets.id
+        WHERE preventive_maintainance.id=$id")->row();
+     $view_data['id'] = $id;
+     $view_data['users'] = $this->db->query("SELECT * FROM users")->result();
 
-    if ($save_id) {
+    $this->load->view('checklists/maintenance/perform_form',$view_data);
+  }
+  function maintenance_p(){
+    $data = array('next_maintenance_date' =>$this->input->post('next_maintenance_date'),
+                   'assigned_id' => $this->input->post('assign'),
+                   'status' => 1,
+                   'performed_by' => $this->login_user->id,
+                   'updated_at' => date('d-m-Y')
+               );
+    $this->db->where('id',$this->input->post('id'))->update('preventive_maintainance',$data);
+    if ($data) {
       echo json_encode(array("success" => true, 'message' => lang('record_saved')));
     } else {
       echo json_encode(array("success" => false, 'message' => lang('error_occurred')));
-    }
+    } 
   }
 
   public function escalate_maintenance() {
@@ -1166,7 +1195,7 @@ public function  entries_details()
 
     $status = "<span class='label $status_class large'>" . $status_data . "</span> ";
 
-    return array($data->id, $this->SAGE_DB()->get_where("_btblFAAsset", array("idAssetNo" => $data->sage_item_id))->row_array()['cAssetDesc'], $data->performed_by != 0 ? $this->Users_model->get_one($data->performed_by)->first_name . " " . $this->Users_model->get_one($data->performed_by)->last_name : $status, date("dS M Y",strtotime($data->maintainance_date)), $status);
+    return array($data->id, $this->SAGE_DB()->get_where("_btblFAAsset", array("idAssetNo" => $data->sage_item_id))->row_array()['cAssetDesc'], $data->performed_by != 0 ? $this->Users_model->get_one($data->performed_by)->first_name . " " . $this->Users_model->get_one($data->performed_by)->last_name : $status,date("dS M Y",strtotime($data->maintainance_date)), $status);
   }
 
 
@@ -1203,8 +1232,7 @@ public function  entries_details()
 
       $target_path = get_setting("support_file_path");
       $files_data = move_files_from_temp_dir_to_permanent_dir($target_path, "ticket");
-var_dump($files_data);
-exit();
+
 
       $ticket_id = $this->Support_entries_model->save($ticket_data, $id);
       $user_id = $this->db->query("SELECT user_ref_id from support_entries WHERE id={$ticket_id}")->row()->user_ref_id;
