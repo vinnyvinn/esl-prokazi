@@ -22,7 +22,8 @@
         "assets/css/style-0000001.css",
         "assets/css/custom-style.css",
         "assets/css/sweetalert2.min.css",
-        "assets/css/jquery.printarea.css"
+        "assets/css/jquery.printarea.css",
+        "assets/css/toastr.min.css"
 
 
     ));
@@ -47,8 +48,11 @@
         "assets/js/app-0000006.js",
         "assets/js/sweetalert2.min.js",
         "assets/js/es6-promise.auto.min.js",
-        "assets/js/jquery.printarea.js"
+        "assets/js/jquery.printarea.js",
+        "assets/js/toastr.min.js"
 
     ));
     ?>
+     
+ 
 </head>

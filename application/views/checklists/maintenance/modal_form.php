@@ -8,7 +8,7 @@
            <select class="select2 validate-hidden" name="ict_assets" id="ict_assets" required>
               <?php
               foreach ($ict_assets_dropdown as $value) {
-                  echo "<option value=\"{$value->cAssetDesc}\">{$value->cAssetCode} : {$value->cAssetDesc}</option>";
+                  echo "<option value=\"{$value->id}\">{$value->card_no} : {$value->title}</option>";
               }
               ?>
             </select>
@@ -34,14 +34,14 @@
            <select class="select2 validate-hidden" name="assign" id="assign" required>
               <?php
               foreach ($assign_dropdown as $value) {
-                  echo "<option value=\"{$value->id}\">{$value->first_name}</option>";
+                  echo "<option value=\"{$value->id}\">{$value->first_name} {$value->last_name}</option>";
               }
               ?>
             </select>
         </div>
     </div>
     <div class="form-group">
-        <label for="inventory" class=" col-md-3">Excalation</label>
+        <label for="inventory" class=" col-md-3">Category</label>
         <div class="col-md-9">
            <select class="select2 validate-hidden" name="excalation" id="excalation" required>
               <?php

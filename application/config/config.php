@@ -2,6 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
+
 /*
   |--------------------------------------------------------------------------
   | Base Site URL
@@ -535,6 +536,8 @@ $config['time_reference'] = 'local';
   | Note: You need to have eval() enabled for this to work.
   |
  */
+
+
 $config['rewrite_short_tags'] = FALSE;
 
 /*

@@ -40,9 +40,10 @@
                 echo "{title: 'ID'},
                 {title: 'ICT Asset'},
                 {title: 'Assigned'},
-                {title: 'Excalation'},
+                {title: 'Category'},
                 {title: 'Status'},
                 {title: 'Date'},
+               
                 {title: '<i class=\"fa fa-bars\"></i>', \"class\": \"text-center option w100\"}";
               }
             ?>

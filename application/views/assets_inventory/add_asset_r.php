@@ -13,10 +13,10 @@
         <p style="font-size: 18px;"><strong>From : </strong> <?php echo $from;?></p>
         <p style="font-size: 18px;"><strong>Copy : </strong><?php echo $hr['first_name'].' '.$hr['last_name'];?></p>
         <p style="font-size: 18px;"><strong>Date : </strong><?php echo date('d-m-Y',strtotime($asset->updated_at));?></p>
-        <p style="font-size: 18px;"><strong>Subject : Company Assets Issued</strong></p>
+        <p style="font-size: 18px;"><strong>Subject : Company Assets Returned</strong></p>
         <hr style=" border: 1px solid black;margin-top: 0;">
 <p>
-    Find below list of company assets issued to you.
+    Find below list of company assets returned by you.
 </p>
         <p>
             <ul class="list-group">
@@ -27,7 +27,7 @@
 
          </p>
         <p>
-            The above assets are under your care and supervision. You are required to take good care of them.
+            The above assets were under your care and supervision. You were required to take good care of them.
             They are to be returned to the company in good condition, fair, wear and tear exempted.
         </p>
         <p>

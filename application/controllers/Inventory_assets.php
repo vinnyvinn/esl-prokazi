@@ -27,6 +27,8 @@ class Inventory_assets extends Pre_loader {
    $this->template->rander("assets_inventory/index",$data);
  }
 
+ 
+
 
  public function add_asset()
  {
@@ -51,40 +53,9 @@ class Inventory_assets extends Pre_loader {
 
 
   $this->db->insert('inventory_assets',$data);
-  $inserted = $this->db->insert_id();
 
-  $to = $this->db->query("SELECT * FROM users WHERE id=$custodian")->row_array();
-  $hr = $this->db->query("SELECT * FROM users WHERE job_title like '%Corporate Support : HR & Admin Manager%'")->row_array();
-  $email_asset = array(
-    'asset' => $this->input->post('title'),
-    'to' => $to['first_name'] .' '.$to['last_name'],
-    'to_email' => $to['email'],
-    'from' => $this->login_user->first_name. ' '.$this->login_user->last_name,
-    'from_email' => $this->login_user->email,
-    'cc' => $hr['first_name'] .' '.$hr['last_name'],
-    'cc_email' => $hr['email'],
-    'asset_id' => $inserted,
-    'asset_url' => get_uri('inventory_assets/view/'.$inserted),
-  );
-
-  $this->_mail_asset($email_asset);
   return redirect(base_url('inventory_assets'));
 
-}
-
-public function view_form($id){
-
-$user = $this->db->query("SELECT * FROM inventory_assets WHERE id=$id")->row_array();
-
-$custodian = $user['custodian'];
-$from = $user['assign_by'];
-$view_data['id'] = $id;
-$view_data['asset'] = $this->db->query("SELECT * FROM inventory_assets WHERE id=$id")->row_array();
-$view_data['custodian'] = $this->db->query("SELECT * FROM users WHERE id=$custodian")->row_array();
-$view_data['from'] = $this->db->query("SELECT * FROM users WHERE id=$from")->row_array();
-$view_data['hr'] = $this->db->query("SELECT * FROM users WHERE job_title like '%Corporate Support : HR & Admin Manager%'")->row_array();
-$view_data['assets'] = $this->db->query("SELECT * FROM inventory_assets where custodian={$user['custodian']}")->result();
-$this->template->rander('assets_inventory/add_asset',$view_data);
 }
 
 public function print_form($id){
@@ -99,7 +70,7 @@ $this->template->rander('assets_inventory/print_form',$view_data);
 }
 
 public function save_changes($asset_id){
-     $custodian = $this->input->post('custodian');
+ 
 
   $data = array(
    'card_no' => $this->input->post('card_no'),
@@ -108,51 +79,40 @@ public function save_changes($asset_id){
    'serial_no' => $this->input->post('serial_no'),
    'location' => $this->input->post('location'),
    'category' => $this->input->post('category'),
-   'custodian' => $custodian,
    'department' => $this->input->post('department'),
    'supplier' => $this->input->post('supplier'),
+   'custodian' => $this->input->post('custodian'),
    'status' => 0,
    'assign_by' => $this->login_user->id,
    'updated_at' => date('Y-m-d H:i:s'),
    'created_at' => date('Y-m-d H:i:s'),
  );
 
+// var_dump($data);
+// die();
 
   $this->db->where('id',$asset_id);
   $this->db->update('inventory_assets',$data);
+
+
   $order = $this->db->query("SELECT * FROM inventory_assets ORDER BY updated_at  DESC LIMIT 1")->row();
   $asset_no = $order->title;
-
-
   if($asset_no){
 
-           $supplier_id =$this->SAGE_DB()->query("SELECT * FROM Vendor WHERE Name like '%$order->supplier%'")->row()->DCLink;
+      $supplier_id =$this->SAGE_DB()->query("SELECT * FROM Vendor WHERE Name like '%$order->supplier%'")->row()->DCLink;
       $location_id = $this->SAGE_DB()->query("SELECT * FROM _btblFALocation WHERE cLocationDesc like '%$order->location%'")->row()->idLocationNo;
 
-         $this->SAGE_DB()->query("UPDATE _btblFAAsset SET cAssetCode='$order->card_no',cAssetDesc='$order->title',iSupplierNo=$supplier_id,
+if ($order->custodian) {
+ $this->SAGE_DB()->query("UPDATE _btblFAAsset SET cAssetCode='$order->card_no',cAssetDesc='$order->title',iSupplierNo=$supplier_id,
       ucFACustodian=$order->custodian,iLocationNo=$location_id WHERE cAssetDesc like '%$asset_no%'");
-
-
-
-   }
-  if($custodian) {
-      $to = $this->db->query("SELECT * FROM users WHERE id=$custodian")->row_array();
-      $hr = $this->db->query("SELECT * FROM users WHERE job_title like '%Corporate Support : HR & Admin Manager%'")->row_array();
-      $email_asset = array(
-          'asset' => $this->input->post('title'),
-          'to' => $to['first_name'] . ' ' . $to['last_name'],
-          'to_email' => $to['email'],
-          'from' => $this->login_user->first_name . ' ' . $this->login_user->last_name,
-          'from_email' => $this->login_user->email,
-          'cc' => $hr['first_name'] . ' ' . $hr['last_name'],
-          'cc_email' => $hr['email'],
-          'asset_id' => $this->input->post('id'),
-          'asset_url' => get_uri('inventory_assets/view/' . $this->input->post('id')),
-      );
-
-      $this->_mail_asset($email_asset);
-  }
-  return redirect(base_url('inventory_assets'));
+}
+else{
+   $this->SAGE_DB()->query("UPDATE _btblFAAsset SET cAssetCode='$order->card_no',cAssetDesc='$order->title',iSupplierNo=$supplier_id,
+      iLocationNo=$location_id WHERE cAssetDesc like '%$asset_no%'");
+}
+    
+}
+return redirect(base_url('inventory_assets'));
 }
 public function view($id){
   $asset_info = $this->Assets_inventory_model->get_assets_by_id($id);
@@ -202,33 +162,112 @@ else
 }
 
 public function accept_asset($id){
-       $status = ['status' => 1];
+       $status = ['state' => 1];
        $this->db->where('id',$id);
-       $this->db->update('inventory_assets',$status);
-       return redirect(base_url('inventory_assets/view_form/'.$id));
+       $this->db->update('return_assets',$status);
+
+        $asset = $this->db->query("SELECT * FROM return_assets where id=$id")->row();
+        $inv =  $this->db->query("SELECT * FROM inventory_assets where id={$asset->asset_id}")->row();
+        $user = $this->db->query("SELECT return_assets.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM return_assets
+                          LEFT JOIN users ON users.id=return_assets.user_id
+                          WHERE return_assets.id=$id")->row();
+        $res= explode(" ",$asset->created_by);
+        $lname = array_pop($res);
+        $assign = $this->db->query("SELECT * FROM users WHERE first_name LIKE '%$res[0]%' AND last_name LIKE '%$lname%'")->row();
+        
+        //var_dump($custodian);
+        $email_data = array(
+            'assign_by' =>  $asset->created_by,
+            'assign_by_email' => $assign->email,
+            'asset_id' => $asset->asset_id,
+            'asset_title' => $inv->title,
+            'custodian' => $user->username,
+            'custodian_email' => $user->email,
+            'asset_url' => get_uri('return_assets/issues'),
+        );
+        $this->_mail_asset_accepted($email_data);
+       return redirect(base_url('return_assets/view_form/'.$id));
+}
+public function accept_asset_r($id){
+       $status = ['state' => 3];
+       $this->db->where('id',$id);
+       $this->db->update('return_assets',$status);
+
+        $asset = $this->db->query("SELECT * FROM return_assets where id=$id")->row();
+        $inv =  $this->db->query("SELECT * FROM inventory_assets where id={$asset->asset_id}")->row();
+        $user = $this->db->query("SELECT return_assets.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM return_assets
+                          LEFT JOIN users ON users.id=return_assets.user_id
+                          WHERE return_assets.id=$id")->row();
+        $res= explode(" ",$asset->created_by);
+        $lname = array_pop($res);
+        $assign = $this->db->query("SELECT * FROM users WHERE first_name LIKE '%$res[0]%' AND last_name LIKE '%$lname%'")->row();
+        
+        //var_dump($custodian);
+        $email_data = array(
+            'assign_by' =>  $asset->created_by,
+            'assign_by_email' => $assign->email,
+            'asset_id' => $asset->asset_id,
+            'asset_title' => $inv->title,
+            'custodian' => $user->username,
+            'custodian_email' => $user->email,
+            'asset_url' => get_uri('return_assets'),
+        );
+        $this->_mail_asset_accepted_r($email_data);
+       return redirect(base_url('return_assets/view_form_r/'.$id));
 }
 
     public function reject_asset($id){
-        $status = ['status' => 2];
+        $status = ['state' => 2];
         $this->db->where('id',$id);
-        $this->db->update('inventory_assets',$status);
-        $user = $this->db->query("SELECT inventory_assets.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM inventory_assets
-                          LEFT JOIN users ON users.id=inventory_assets.assign_by
-                          WHERE inventory_assets.id=$id")->row();
-        $user_id = $user->custodian;
-        $custodian = $this->db->query("SELECT CONCAT(first_name,' ',last_name) as custodian,email FROM users WHERE id=$user_id")->row();
-        var_dump($custodian);
+        $this->db->update('return_assets',$status);
+        $asset = $this->db->query("SELECT * FROM return_assets where id=$id")->row();
+        $inv =  $this->db->query("SELECT * FROM inventory_assets where id={$asset->asset_id}")->row();
+        $user = $this->db->query("SELECT return_assets.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM return_assets
+                          LEFT JOIN users ON users.id=return_assets.user_id
+                          WHERE return_assets.id=$id")->row();
+        $res= explode(" ",$asset->created_by);
+        $lname = array_pop($res);
+        $assign = $this->db->query("SELECT * FROM users WHERE first_name LIKE '%$res[0]%' AND last_name LIKE '%$lname%'")->row();
+        
+        //var_dump($custodian);
         $email_data = array(
-            'assign_by' => $user->username,
-            'assign_by_email' => $user->email,
-            'asset_id' => $user->id,
-            'asset_title' => $user->title,
-            'custodian' => $custodian->custodian,
-            'custodian_email' => $custodian->email,
-            'asset_url' => get_uri('inventory_assets/edit/'.$user->id),
+            'assign_by' =>  $asset->created_by,
+            'assign_by_email' => $assign->email,
+            'asset_id' => $asset->asset_id,
+            'asset_title' => $inv->title,
+            'custodian' => $user->username,
+            'custodian_email' => $user->email,
+            'asset_url' => get_uri('return_assets/issues'),
         );
         $this->_mail_asset_sender($email_data);
-        return redirect(base_url('inventory_assets'));
+        return redirect(base_url('return_assets/issues'));
+    }
+
+ public function reject_asset_r($id){
+          $status = ['state' => 4];
+        $this->db->where('id',$id);
+        $this->db->update('return_assets',$status);
+        $asset = $this->db->query("SELECT * FROM return_assets where id=$id")->row();
+        $inv =  $this->db->query("SELECT * FROM inventory_assets where id={$asset->asset_id}")->row();
+        $user = $this->db->query("SELECT return_assets.*,CONCAT(users.first_name,' ',users.last_name) as username,users.email FROM return_assets
+                          LEFT JOIN users ON users.id=return_assets.user_id
+                          WHERE return_assets.id=$id")->row();
+        $res= explode(" ",$asset->created_by);
+        $lname = array_pop($res);
+        $assign = $this->db->query("SELECT * FROM users WHERE first_name LIKE '%$res[0]%' AND last_name LIKE '%$lname%'")->row();
+        
+        //var_dump($custodian);
+        $email_data = array(
+            'assign_by' =>  $asset->created_by,
+            'assign_by_email' => $assign->email,
+            'asset_id' => $asset->asset_id,
+            'asset_title' => $inv->title,
+            'custodian' => $user->username,
+            'custodian_email' => $user->email,
+            'asset_url' => get_uri('return_assets'),
+        );
+        $this->_mail_asset_sender($email_data);
+        return redirect(base_url('return_assets'));
     }
 
     public function _mail_asset_sender($email_data){
@@ -247,7 +286,35 @@ public function accept_asset($id){
 
 
     }
+function _mail_asset_accepted($email_data){
+    $email_template = $this->Email_templates_model->get_final_template("ict_asset_accept");
 
+        $parser_data["EMAIL"] =$email_data['custodian_email'] ;
+        $parser_data["USER_NAME"] =  $email_data['assign_by'];
+        $parser_data["ASSET_ID"] =  $email_data['asset_id'];
+        $parser_data["ASSET_URL"] =  $email_data['asset_url'];
+        $parser_data["ASSET_TITLE"] =  $email_data['asset_title'];
+        $parser_data["CUSTODIAN"] =  $email_data['custodian'];
+        $parser_data["SIGNATURE"] = $email_template->signature;
+        $message = $this->parser->parse_string($email_template->message, $parser_data, TRUE);
+
+        send_app_mail($email_data['assign_by_email'], $email_template->subject, $message);
+}
+
+function _mail_asset_accepted_r($email_data){
+    $email_template = $this->Email_templates_model->get_final_template("ict_asset_return");
+
+        $parser_data["EMAIL"] =$email_data['custodian_email'] ;
+        $parser_data["USER_NAME"] =  $email_data['assign_by'];
+        $parser_data["ASSET_ID"] =  $email_data['asset_id'];
+        $parser_data["ASSET_URL"] =  $email_data['asset_url'];
+        $parser_data["ASSET_TITLE"] =  $email_data['asset_title'];
+        $parser_data["CUSTODIAN"] =  $email_data['custodian'];
+        $parser_data["SIGNATURE"] = $email_template->signature;
+        $message = $this->parser->parse_string($email_template->message, $parser_data, TRUE);
+
+        send_app_mail($email_data['assign_by_email'], $email_template->subject, $message);
+}
 
 public function edit($id){
   $asset_info = $this->Assets_inventory_model->get_assets_by_id($id);
@@ -487,10 +554,18 @@ public function print_report($from,$to){
        LEFT JOIN departments ON departments.id=inventory_assets.department
         WHERE (inventory_assets.updated_at BETWEEN '$from' AND '$to')")->result();
 
+       
+
         $excel_row = 2;
 
         foreach($employee_data as $row)
         {
+          $custo= '';
+          if ($row->custodian) {
+            $idd = $row->custodian;
+            $custo =  $this->db->query("SELECT * FROM users WHERE id=$idd")->row();
+          }
+           
             $object->getActiveSheet()->setCellValueByColumnAndRow(0, $excel_row, $row->card_no);
             $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->title);
             $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $row->category);
@@ -499,7 +574,7 @@ public function print_report($from,$to){
             $object->getActiveSheet()->setCellValueByColumnAndRow(5, $excel_row, $row->designation);
             $object->getActiveSheet()->setCellValueByColumnAndRow(6, $excel_row, $row->username);
             $object->getActiveSheet()->setCellValueByColumnAndRow(7, $excel_row, $row->title);
-            $object->getActiveSheet()->setCellValueByColumnAndRow(8, $excel_row, $row->custodian ? $this->db->query("SELECT CONCAT(first_name,' ',last_name) as nickname FROM users WHERE id={$row->custodian}")->row()->nickname :'');
+            $object->getActiveSheet()->setCellValueByColumnAndRow(8, $excel_row, $custo ? $custo->first_name.' '.$custo->last_name:'');
             $object->getActiveSheet()->setCellValueByColumnAndRow(9, $excel_row, date('d-m-Y',strtotime($row->updated_at)));
             $excel_row++;
         }

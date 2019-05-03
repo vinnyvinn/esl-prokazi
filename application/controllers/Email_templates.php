@@ -35,7 +35,7 @@ class Email_templates extends Pre_loader {
             "third_party" => array("TICKET_ID", "USER_NAME", "MESSAGE","USER_EMAIL","THIRD_PARTY_NAME" ,"SIGNATURE"),
             "next_maintenance_date" => array("VEHICLE_NO", "USER_NAME", "MILEAGE","TITLE","SIGNATURE"),
             "ict_asset_issue" => array("TO", "FROM", "ASSET", "ASSET_URL", "SIGNATURE"),
-            "ict_asset_accept" => array("TO", "FROM", "ASSET", "ASSET_URL", "SIGNATURE"),
+            "ict_asset_accept" => array("TO", "FROM", "ASSET", "ASSET_URL","SENDER_EMAIL", "SIGNATURE"),
             "ict_asset_decline" => array("EMAIL", "USER_NAME", "ASSET_ID", "ASSET_TITLE","ASSET_URL","CUSTODIAN","SIGNATURE"),
             "ict_asset_return" => array("TO", "FROM", "ASSET", "ASSET_URL","SENDER_EMAIL", "SIGNATURE"),
             "assign_asset" => array("TO", "FROM", "CC","ASSET","'ASSET_ID","ASSET_URL", "SENDER_EMAIL","SIGNATURE"),
