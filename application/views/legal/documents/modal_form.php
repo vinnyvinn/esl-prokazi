@@ -42,12 +42,13 @@
     <div id="from_to">
         <div class="form-group">
             <label for="deadline" class=" col-md-3"><?php echo lang('covered_from'); ?></label>
-            <div class=" col-md-9">
+
+               	    <div class=" col-md-9">
                 <?php
                 echo form_input(array(
                     "id" => "covered_from",
                     "name" => "covered_from",
-                    "value" => $model_info->covered_from * 1 ? $model_info->covered_from : "",
+                //    "value" => $model_info->covered_from * 1 ? $model_info->covered_from : "",
                     "class" => "form-control",
                     "placeholder" => lang('covered_from'),
                     //"data-date-start-date" => "+1d"
@@ -62,7 +63,7 @@
                 echo form_input(array(
                     "id" => "covered_to",
                     "name" => "covered_to",
-                    "value" => $model_info->covered_to * 1 ? $model_info->covered_to : "",
+                 //   "value" => $model_info->covered_to * 1 ? $model_info->covered_to : "",
                     "class" => "form-control",
                     "placeholder" => lang('covered_to'),
                     //"data-date-start-date" => "+1d"

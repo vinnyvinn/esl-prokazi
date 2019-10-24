@@ -1,5 +1,4 @@
 <?php
-//error_reporting(E_ALL);
 //define('ENVIRONMENT', 'development');
 
 //require_once "./vendor/autoload.php";

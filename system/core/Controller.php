@@ -6,7 +6,7 @@
  *
  * This content is released under the MIT License (MIT)
  *
- * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
+ * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,8 @@
  * @package	CodeIgniter
  * @author	EllisLab Dev Team
  * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
- * @license	http://opensource.org/licenses/MIT	MIT License
+ * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
+ * @license	https://opensource.org/licenses/MIT	MIT License
  * @link	https://codeigniter.com
  * @since	Version 1.0.0
  * @filesource
@@ -48,48 +48,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @category	Libraries
  * @author		EllisLab Dev Team
  * @link		https://codeigniter.com/user_guide/general/controllers.html
- *
- * * @property CI_DB_active_record $db
- * @property CI_DB_forge $dbforge
- * @property CI_Benchmark $benchmark
- * @property CI_Calendar $calendar
- * @property CI_Cart $cart
- * @property CI_Config $config
- * @property CI_Controller $controller
- * @property CI_Email $email
- * @property CI_Encrypt $encrypt
- * @property CI_Exceptions $exceptions
- * @property CI_Form_validation $form_validation
- * @property CI_Ftp $ftp
- * @property CI_Hooks $hooks
- * @property CI_Image_lib $image_lib
- * @property CI_Input $input
- * @property CI_Lang $lang
- * @property CI_Loader $load
- * @property CI_Log $log
- * @property CI_Model $model
- * @property CI_Output $output
- * @property CI_Pagination $pagination
- * @property CI_Parser $parser
- * @property CI_Profiler $profiler
- * @property CI_Router $router
- * @property CI_Session $session
- * @property CI_Sha1 $sha1
- * @property CI_Table $table
- * @property CI_Trackback $trackback
- * @property CI_Typography $typography
- * @property CI_Unit_test $unit_test
- * @property CI_Upload $upload
- * @property CI_URI $uri
- * @property CI_User_agent $user_agent
- * @property CI_Validation $validation
- * @property CI_Xmlrpc $xmlrpc
- * @property CI_Xmlrpcs $xmlrpcs
- * @property CI_Zip $zip
- * @property CI_Javascript $javascript
- * @property CI_Jquery $jquery
- * @property CI_Utf8 $utf8
- * @property CI_Security $security
  */
 class CI_Controller {
 
@@ -99,6 +57,13 @@ class CI_Controller {
 	 * @var	object
 	 */
 	private static $instance;
+
+	/**
+	 * CI_Loader
+	 *
+	 * @var	CI_Loader
+	 */
+	public $load;
 
 	/**
 	 * Class constructor
